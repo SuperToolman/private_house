@@ -22,32 +22,26 @@ export default defineConfig({
       // 关键代码
       '@': path.resolve(__dirname, './src'),
       '@view': path.resolve(__dirname, './src/view'),
+      '@common':path.resolve(__dirname,'./src/common'),
       '@components': path.resolve(__dirname, './src/components'),
       '@stores': path.resolve(__dirname, './src/stores'),
-      '@assets': path.resolve(__dirname, './src/assets')
+      '@assets': path.resolve(__dirname, './src/assets'),
+      '@request': path.resolve(__dirname, './src/request')
     }
   },
-  devServer: {
-    open: true, //配置自动启动浏览器
-    host: "localhost",
-    https: false,
-    hotOnly: false, //热更新
-    port: 80,
-    // 配置跨域-请求后端的接口
-    proxy: {
-      // "/api": {
-      //   target: "http://172.20.10.3:80", //对应自己的接口
-      //   changeOrigin: true,
-      //   ws: true,
-      //   pathRewrite: {
-      //     "^/api": ""
-      //   }
-      // }
-    }
-  },
+  // devServer是webPack.js用的，这里我使用vite直接跟vite的server合并了
   server:{
-    host:'localhost' ,//ip地址
-    port: 5175, // 设置服务启动端口号
-    open: true, // 设置服务启动时是否自动打开浏览器
+    host: 'localhost', // 本地开发服务器地址
+    port: 5175, // 开发服务器端口号
+    open: true, // 启动时自动打开浏览器
+    https: false, // 启用 HTTPS，默认 false，若需要 HTTPS，请设置为 true 或提供 HTTPS 配置
+    hot: true, // 启用热模块替换
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000', // 后端 API 地址
+        changeOrigin: true, // 修改请求头中的 Origin
+        rewrite: path => path.replace(/^\/api/, ''), // 重写路径
+      },
+    },
   }
 });

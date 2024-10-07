@@ -1,0 +1,45 @@
+@import "//at.alicdn.com/t/c/font_4410328_zk825mrlq0q.css";
+@font-face {
+    font-family: "iconfont"; /* Project id 4410328 */
+    src: url('//at.alicdn.com/t/c/font_4410328_qtc1wtr6ne.woff2?t=1705219040753') format('woff2'),
+    url('//at.alicdn.com/t/c/font_4410328_qtc1wtr6ne.woff?t=1705219040753') format('woff'),
+    url('//at.alicdn.com/t/c/font_4410328_qtc1wtr6ne.ttf?t=1705219040753') format('truetype');
+}
+
+.iconfont {
+    font-family: "iconfont" !important;
+    font-size: 16px;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.icon-user_level_1:before {
+    content: "\e6cc";
+    color: #bfbfbf;
+    font-size: 28px;
+}
+.icon-user_level_2:before {
+    content: "\e6cd";
+    color: #50f45b;
+    font-size: 28px;
+}
+.icon-user_level_3:before {
+    content: "\e6ce";
+    color: #1296db;
+    font-size: 28px;
+}
+.icon-user_level_4:before {
+    content: "\e6cf";
+    color: #f4b575;
+    font-size: 28px;
+}
+.icon-user_level_5:before {
+    content: "\e6d0";
+    color: #f57d04;
+    font-size: 28px;
+}
+.icon-user_level_6:before {
+    content: "\e6d1";
+    color: #d81e06;
+    font-size: 28px;
+}

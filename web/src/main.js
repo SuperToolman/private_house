@@ -1,17 +1,12 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-
-//导入ELement-puls
-// import ElementPlus from 'element-plus'
-// import 'element-plus/dist/index.css'
-
-
 import { DatePicker } from 'ant-design-vue';
 import 'ant-design-vue/dist/reset.css';
 import router from '/src/router/index.js'
-import {api} from "./request/mangement.js";
+import {api} from "@request/mangement";
 import { createPinia } from 'pinia'
-import "./assets/test.css"
+import "@assets/iconfont.css"
+import '@common/style/common_style.css'
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -19,9 +14,8 @@ const pinia = createPinia();
 app.use(DatePicker)
 app.use(router);
 app.use(pinia)
-app.mount('#app')
 
 app.provide('api',api)
-app.provide('animeResource',"http://192.168.1.68:8080/animeResouse/anime/")
-app.provide('videoResource',"http://localhost:8080/")
-app.provide('userAvatarResource',"http://localhost:8080/UserAvatar/")
+app.provide('resourceUrl','http://localhost:9080/')
+app.provide('resourceByUserAvatarUrl','http://localhost:9080/UserAvatarResources/')
+app.mount('#app')
