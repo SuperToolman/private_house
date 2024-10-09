@@ -35,7 +35,6 @@ export class BaseApi {
         })
     }
     GetById = (id) => {
-        console.log(`Delete ${this.controllerName}`)
         return myAxios({
             method: 'get',
             url: `/${this.controllerName}/Id?id=${id}`

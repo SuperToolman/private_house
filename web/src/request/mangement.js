@@ -5,6 +5,7 @@ import userTag from "./api/user/api-userTag.js";
 import video from './api/video/api-video.js';
 import videoArea from './api/video/api-videoArea'
 import videoTag from './api/video/api-videoTag'
+import videoHistoryAuditStatus from "@request/api/video/api-videoHistoryAuditStatus";
 
 import systemMenu from './api/system/api-systemMenu'
 import systemConfig from './api/system/api-systemConfig'
@@ -19,6 +20,7 @@ export const api = {
     videoApi:new video(),
     videoAreaApi:new videoArea(),
     videoTagApi:new videoTag(),
+    videoHistoryAuditStatusApi:new videoHistoryAuditStatus(),
 
     systemMenuApi:new systemMenu(),
     systemConfig:new systemConfig(),

@@ -17,11 +17,9 @@ const routes = [
     {
         path:'/video',component:()=>import('@view/video/index.vue'),
         children: [
-            {path: ":videoId", component: () => import('@view/video/management/Info.vue'),},
             {path: "management", component: () => import('@view/video/management/Index.vue'),},
-            {
-                path: "submission_and_review",component:()=>import('@view/video/submission_and_review/Index.vue'),
-            },
+            {path: ":videoId", component: () => import('@view/video/management/Info.vue'),},
+            {path: "submission_and_review",component:()=>import('@view/video/submission_and_review/Index.vue'),},
             // {path: "upload", component: () => import('@view/video/management/Upload.vue')},
             {path: "area", component: () => import('@view/video/area/Index.vue'),},
             {path: "tag", component: () => import('@view/video/tag/Index.vue'),}

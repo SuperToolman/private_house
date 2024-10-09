@@ -7,12 +7,18 @@ const api = inject('api')
 const props = defineProps({
   videoEntity:{type:Object},
 })
+const emits = defineEmits(['handleDeleteVideoDone'])
 const resourceUrl = inject('resourceUrl')
 
 const Delete=(keyValue)=>{
   console.log('删除视频：',keyValue)
   api.videoApi.DeleteById(keyValue).then(res=>{
-    res.isSuccess?message.success(res.message):message.warning(res.message)
+    if (res.isSuccess){
+      message.success(res.message)
+      emits('handleDeleteVideoDone',keyValue)
+    }else{
+      message.warning(res.message)
+    }
   })
 }
 </script>

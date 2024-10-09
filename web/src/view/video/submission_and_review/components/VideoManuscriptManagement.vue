@@ -3,8 +3,10 @@ import PhCard from "@components/ph_inputs/PhCard.vue";
 import {inject, onMounted, ref} from "vue";
 import {message} from "ant-design-vue";
 
-
-const videoList = ref([])
+const emits = defineEmits(['handleDeleteManuscriptVideo'])
+const props = defineProps({
+  manuscriptVideos:{type:Array,default:[]}
+})
 const api = inject('api')
 const videoModelDisplay = ref(false)
 const activeVideoIndex = ref(0)
@@ -21,23 +23,28 @@ const handleAdopt = (video)=>{
   })
 }
 
-onMounted(()=>{
-  api.videoApi.GetByCombinationQuery('',1,5).then(res=>{
+const handleDeleteTask = (video)=>{
+  api.videoApi.DeleteById(video.id).then(res=>{
     if (res.isSuccess){
-      videoList.value = res.data
+      emits('handleDeleteManuscriptVideo',video)
+      message.success(res.message)
     }
+    else message.error(res.message)
   })
-})
+}
+
+
 </script>
 
 <template>
   <ph-card>
-    <div>审核列表：{{videoList.length}}</div>
+    <div>审核列表：{{manuscriptVideos.length}}</div>
     <div class="videoList">
-      <div class="video-item" v-for="(video,index) in videoList" :key="video">
+      <div class="video-item" v-for="(video,index) in manuscriptVideos" :key="video.id">
         <div class="left">
           <div class="item-cover">
-            <a-image :src="resourceUrl+video.coverUrl"/>
+            <a-image v-if="video.coverUrl!==undefined" :src="resourceUrl+video.coverUrl"/>
+            <a-image v-else :src="resourceUrl+`Temp/${video.id}/cover.webp`"/>
           </div>
           <div class="item-infos">
             <div class="video-title" @click="handlePlay(index)">{{video.title}}</div>
@@ -59,7 +66,8 @@ onMounted(()=>{
         <div class="right">
           <div class="item-action">
             <a-button type="primary" @click="handleAdopt(video)">通过</a-button>
-            <a-button style="margin-left: 10px">驳回</a-button>
+            <a-button style="margin:0 10px" danger @click="handleDeleteTask(video)">删除</a-button>
+            <a-button>驳回</a-button>
           </div>
 
         </div>
@@ -70,11 +78,12 @@ onMounted(()=>{
 
 <!--  :ok-button-props="{hidden:true}" :cancel-button-props="{hidden:true}"-->
   <a-modal width="1118px"
-           v-if="videoList && videoList.length>0"
+           v-if="manuscriptVideos && manuscriptVideos.length>0"
            v-model:open="videoModelDisplay"
-           :title="videoList[activeVideoIndex].title" >
+           :title="manuscriptVideos[activeVideoIndex].title" >
     <div class="play-container">
-      <video :src="resourceUrl + videoList[activeVideoIndex].videoUrl" controls/>
+      <video v-if="manuscriptVideos[activeVideoIndex].videoUrl !== undefined" :src="resourceUrl + manuscriptVideos[activeVideoIndex].videoUrl" controls/>
+      <video v-else :src="resourceUrl + `Temp/${manuscriptVideos[activeVideoIndex].id}/video.mp4`" controls/>
     </div>
   </a-modal>
 </template>

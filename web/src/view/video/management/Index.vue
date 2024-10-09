@@ -22,7 +22,7 @@
     <ph-card style="padding: 15px">
       <div class="videos-container">
         <div class="video-wrap" v-for="videoEntity in videoList" :key="videoEntity">
-          <VideoCard :video-entity="videoEntity" />
+          <VideoCard :video-entity="videoEntity" @handle-delete-video-done="(videoId)=>videoList = videoList.filter(x=>x.id !== videoId)"/>
         </div>
       </div>
     </ph-card>
@@ -30,12 +30,8 @@
 </template>
 
 <script setup>
-import {inject, onMounted, reactive, ref, watch} from "vue";
-import {DeleteOutlined, EditOutlined, PlayCircleOutlined, MoreOutlined} from '@ant-design/icons-vue';
-import VideoCard from "@view/video/management/components/VideoCard.vue";
-import PhViewLayout from "@components/ph_inputs/PhViewLayout.vue";
-import PhCard from "@components/ph_inputs/PhCard.vue";
-import PhSelectVideoAreaByParentInput from "@components/ph_inputs/PhSelectVideoAreaByParentInput.vue";
+import VideoCard from "./components/VideoCard.vue";
+
 const api = inject('api');
 const videoList = ref([])//定义表格的数据
 const videoAreaId = ref('')

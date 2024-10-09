@@ -1,12 +1,13 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import { DatePicker } from 'ant-design-vue';
-import 'ant-design-vue/dist/reset.css';
 import router from '/src/router/index.js'
 import {api} from "@request/mangement";
 import { createPinia } from 'pinia'
+
 import "@assets/iconfont.css"
 import '@common/style/common_style.css'
+import 'ant-design-vue/dist/reset.css';
 
 const app = createApp(App);
 const pinia = createPinia();

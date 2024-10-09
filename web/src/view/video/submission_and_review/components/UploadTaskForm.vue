@@ -6,42 +6,27 @@ import PhSelectVideoAreaModal2 from "@components/ph_inputs/PhSelectVideoAreaInpu
 import PhCard from "@components/ph_inputs/PhCard.vue";
 import PhSelectUserModal from "@components/ph_inputs/PhSelectUserModal.vue";
 import {inject} from "vue";
+import {message} from "ant-design-vue";
+import LocalStoreHelper from "@common/js/localStorageHelper";
 
 const api = inject('api')
 const props = defineProps({
   videos:{type:Array,default:[]},
   activeVideoIndex:{type:Number,default:-1}
 })
-const emits = defineEmits(['handleSelectUserChange','handleSelectAreaChange'])
+const emits = defineEmits(['handleSelectUserChange','handleSelectAreaChange','handleOnlySubmission','handleAllSubmission'])
 
 const handleSelectUser = (userEntity) => emits('handleSelectUserChange',userEntity)
 
 const handleSelectArea = (areaEntity) => emits('handleSelectAreaChange',areaEntity)
 
-const handleOnlySubmission = () => {
-  console.log('投稿焦点视频表单：', props.videos[props.activeVideoIndex])
-  // api.videoApi.SubmissionForReview(videos.value[activeVideoIndex.value]).then(res => {
-  //   //投稿成功删除本地存储
-  //   try {
-  //     if (res.isSuccess) {
-  //       LocalStoreHelper.removeItemByIdFromVideoArray(videos.value[activeVideoIndex.value].id)
-  //       message.success(res.message)
-  //       //将该视频移除任务列表
-  //       const backIndex = activeVideoIndex.value - 1;
-  //       if (backIndex === -1) {
-  //         //移除的视频为唯一任务
-  //         videos.value = []
-  //       }
-  //     }
-  //   } catch (error) {
-  //     message.error(`投稿成功！但移除该本地存储发生错误：${error}`)
-  //   }
-  // })
+const handleChangeTagList = (tagArray)=>{
+  if(tagArray !== null && tagArray.length >0){
+    props.videos[props.activeVideoIndex].tagString = tagArray.join(',');
+  }
 }
 
-const handleAllSubmission = () => {
-  console.log(props.videos)
-}
+
 
 
 </script>
@@ -86,8 +71,8 @@ const handleAllSubmission = () => {
         <a-input v-model:value="videos[activeVideoIndex].desc"/>
       </a-form-item>
       <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
-        <a-button type="primary" @click="handleOnlySubmission">投稿当前</a-button>
-        <a-button type="primary" @click="handleAllSubmission">投稿全部</a-button>
+        <a-button type="primary" @click="emits('handleOnlySubmission')">投稿当前</a-button>
+        <a-button type="primary" @click="emits('handleAllSubmission')">投稿全部</a-button>
       </a-form-item>
     </a-form>
   </ph-card>

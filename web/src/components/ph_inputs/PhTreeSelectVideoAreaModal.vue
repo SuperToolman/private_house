@@ -18,7 +18,6 @@
 </template>
 
 <script setup>
-import {inject, onMounted, ref, watch} from 'vue';
 
 // 定义从父组件传递的 props
 const props = defineProps({

@@ -7,14 +7,16 @@ import localStorageHelper from "@common/js/localStorageHelper";
 import VideoManuscriptManagement from "@view/video/submission_and_review/components/VideoManuscriptManagement.vue";
 import UploadTask from "@view/video/submission_and_review/components/UploadTask.vue";
 import UploadTaskForm from "@view/video/submission_and_review/components/UploadTaskForm.vue";
+import LocalStoreHelper from "@common/js/localStorageHelper";
+import {message} from "ant-design-vue";
 
 const api = inject('api');
 const videos = ref([]);
-const activeVideoIndex = ref(null);
+const manuscriptVideos = ref([])
+const activeVideoIndex = ref(-1);
 const localFileList = ref([])
 
 const handleUploadClick = ()=>{
-  console.log('handleUpload2')
   document.getElementById('videoFiles').click();
 }
 const handleFileChange = async (event) => {
@@ -104,7 +106,9 @@ const createPreviews = async (video) => {
   if (!video.previews.length) {
     const videoHelper = new VideoHelper(video.file);
     const previews = await videoHelper.getRandomPreviews(5);
+    const test = await videoHelper.getDuration()
     video.durationBySecond = await videoHelper.getDuration()
+    console.log(test)
     video.previews = previews;
     video.cover = previews[0];
   }
@@ -134,23 +138,55 @@ const handleClearLocalStorage = async () => {
     localFileList.value = null;
   }
 }
+const handleActivateIndexChange = (index)=>{
+  activeVideoIndex.value = index
+}
 const handleSelectUser = (userEntity) => {
   videos.value[activeVideoIndex.value].userEntity = userEntity
   videos.value[activeVideoIndex.value].userId = userEntity.id
 }
 const handleSelectArea = (areaEntity) => {
-  videos.value[activeVideoIndex.value].videoAreaId = areaEntity.child.id
+  videos.value[activeVideoIndex.value].videoAreaId = areaEntity.child.value
   videos.value[activeVideoIndex.value].videoAreaEntity = areaEntity;
   console.log('选中的分区', videos.value[activeVideoIndex.value].videoAreaEntity)
 }
-const handleChangeTagList = (tagArray)=>{
-  if(tagArray !== null && tagArray.length >0){
-    videos.value[activeVideoIndex.value].tagString = tagArray.join(',');
-  }
+const handleOnlySubmission = () => {
+  console.log('投稿焦点视频表单：', videos.value[activeVideoIndex.value])
+  api.videoApi.SubmissionForReview(videos.value[activeVideoIndex.value]).then(res => {
+    //投稿成功删除本地存储
+    try {
+      if (res.isSuccess) {
+        //上传成功
+        //移除本地表单数据
+        LocalStoreHelper.removeItemByIdFromVideoArray(videos.value[activeVideoIndex.value].id)
+        //将该视频移除任务列表
+        manuscriptVideos.value.push(videos.value[activeVideoIndex.value])
+        videos.value = videos.value.filter(x=>x.id !== videos.value[activeVideoIndex.value].id)
+        const backIndex = activeVideoIndex.value - 1;
+        if (backIndex === -1) {
+          //移除的视频为唯一任务
+          videos.value = []
+          message.success(res.message)
+        }
+      }
+    } catch (error) {
+      message.error(`投稿成功！但移除该本地存储发生错误：${error}`)
+    }
+  })
 }
-
+const handleAllSubmission = () => {
+  console.log(videos.value)
+}
+//删除审核队列item
+const handleDeleteManuscriptVideo = (video)=> manuscriptVideos.value = manuscriptVideos.value.filter(x=>x.id !== video.id)
 onMounted(() => {
   localFileList.value = localStorageHelper.getItem('video_upload_record')
+  //初始化审核列表
+  api.videoApi.GetByCombinationQuery('',1,5).then(res=>{
+    if (res.isSuccess){
+      manuscriptVideos.value = res.data
+    }
+  })
 })
 </script>
 
@@ -174,7 +210,7 @@ onMounted(() => {
               :videos="videos"
               :active-video-index="activeVideoIndex"
               @handle-upload-click="handleUploadClick"
-              @handle-activate-index-change="(index)=>activeVideoIndex = index"/>
+              @handle-activate-index-change="handleActivateIndexChange"/>
 
           <!--焦点任务的基本信息-->
           <UploadTaskForm
@@ -182,12 +218,14 @@ onMounted(() => {
               :active-video-index="activeVideoIndex"
               @handle-select-user-change="handleSelectUser"
               @handle-select-area-change="handleSelectArea"
+              @handle-only-submission="handleOnlySubmission"
+              @handle-all-submission="handleAllSubmission"
           />
         </div>
 
         <ph-card v-else>
           <div class="no-file-container">
-            <img class="update_icon" src="../../../assets/HarmonyOS_Icons/ic_public_upload.svg">
+            <img class="update_icon" src="@assets/HarmonyOS_Icons/ic_public_upload.svg">
             <span>拖拽此处也可以上传</span>
             <div class="btn_upload" @click="handleUploadClick">上传视频</div>
           </div>
@@ -195,7 +233,9 @@ onMounted(() => {
       </div>
     </div>
 
-    <video-manuscript-management/>
+    <video-manuscript-management
+        :manuscript-videos="manuscriptVideos"
+        @handle-delete-manuscript-video="handleDeleteManuscriptVideo"/>
   </ph-view-layout>
 
 

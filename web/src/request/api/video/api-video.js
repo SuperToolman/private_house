@@ -69,4 +69,11 @@ export default class extends BaseApi{
             maxContentLength: Infinity, // 设置最大内容长度为无限大
         })
     }
+
+    PushTagByString =(tagString,videoId)=>{
+        return myAxios({
+            method:'post',
+            url:`/Video/PushTagByString?tagString=${tagString}&videoId=${videoId}`,
+        })
+    }
 }
