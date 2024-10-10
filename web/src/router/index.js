@@ -42,8 +42,14 @@ const routes = [
             {path:'file',component:()=>import('@view/system/file/Index.vue'),}
         ]
     },
-
-
+    {
+        path:'/manga',component:()=>import('@view/manga/Index.vue'),
+        children: [
+            {path: 'management',component:()=>import('@view/manga/management/Index.vue')},
+            {path: "info/:mangaId", component: () => import('@view/manga/info/Index.vue'),},
+            {path: ":mangaId",component:()=>import('@view/manga/read/Index.vue')}
+        ]
+    }
 ]
 
 //导出路由

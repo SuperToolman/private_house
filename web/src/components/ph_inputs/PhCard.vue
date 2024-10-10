@@ -27,6 +27,7 @@ const props = defineProps({
   //margin-right: 12px;
   margin: 6px;
   box-shadow: 1px 2px 3px 1px rgba(116, 116, 116, 0.15);
+  overflow: hidden;
 
   .card-content-title{
     //padding-left: 24px;
