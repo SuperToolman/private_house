@@ -1,6 +1,8 @@
 <script setup>
 const props = defineProps({
-  mangaEntity:{type:Object,default:null}
+  mangaEntity:{type:Object,default:null},
+  width:{type:Number},
+  height:{type:Number}
 })
 const getRandomColor = () => {return getRandomColorCode();}
 const loading = ref(true)
@@ -13,9 +15,13 @@ onMounted(()=>{
 </script>
 
 <template>
-  <PhCard class="manga_card_wrap" style="padding: 0">
+  <PhCard class="manga_card_wrap" :style="{
+    'padding': 0,
+    'width':`${width}px`,
+    'height':`${height}px`
+  }">
     <div class="cover">
-      <a-image :preview="false" src="src/assets/testManga-cover.jpg"/>
+      <PhImage :preview="false" src="/src/assets/test.jpg"/>
       <div class="info-overlay">
         <div class="info-wrap">
           <div class="title-overlay">
@@ -51,7 +57,6 @@ onMounted(()=>{
 .manga_card_wrap{
   position: relative;
   //width: 180px;
-  width: 184px;
   //box-shadow: 0 0 0 0 #000000;
 
   .cover{
@@ -59,7 +64,7 @@ onMounted(()=>{
     border-radius: 8px;
     overflow: hidden;
     width: 100%;
-    height: 240px;
+    height: 100%;
     position: relative; /* 添加相对定位 */
   }
 

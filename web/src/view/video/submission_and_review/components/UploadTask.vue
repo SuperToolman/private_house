@@ -7,9 +7,7 @@ const props = defineProps({
   activeVideoIndex:{type:Number,default:-1}
 })
 const emits = defineEmits(['handleUploadClick','handleActivateIndexChange'])
-const calculativeWidth = () => props.videos.length > 5
-    ? `calc(${100 / props.videos.length}% - ${108 / props.videos.length}px)`
-    : '218px';
+const calculativeWidth = () => props.videos.length > 5 ? `calc(${100 / props.videos.length}% - ${108 / props.videos.length}px)` : '218px';
 
 const handleUpload = () => {
   console.log('handleUpload')

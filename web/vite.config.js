@@ -33,6 +33,13 @@ export default defineConfig({
       resolvers: [AntDesignVueResolver()] // 使用 Ant Design Vue 的解析器
     }),
   ],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: "modern-compiler" // or 'modern'
+      }
+    }
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'), // src 目录别名

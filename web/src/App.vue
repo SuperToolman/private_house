@@ -27,6 +27,7 @@ const handleMenuClick = (e) => {
     width: 100%;
     padding: 0 10px;
     background-color: var(--bg3);
+    min-height: 100vh;
   }
 }
 </style>
