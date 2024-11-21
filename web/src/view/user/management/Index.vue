@@ -2,7 +2,10 @@
   <!--头部-->
   <ph-view-layout title="用户信息管理" sub-title="管理和查看用户们的信息">
     <template #view-tool>
-      <a-button type="primary" @click="openDrawer('添加', true,null)">添加</a-button>
+      <a-space>
+        <a-button type="primary" @click="openDrawer('添加', true,null)">添加</a-button>
+        <EasyUserModal/>
+      </a-space>
     </template>
 
     <ph-card>
@@ -12,7 +15,7 @@
           <template v-if="column.key === 'name'">
             <a-image
                 v-if="record.haveAvatar"
-                :src="`${userAvatarResource}${record.id}.webp`"
+                :src="`${userAvatarResource}${record.uuid}.webp`"
                 style="height: 30px; width: 30px; border-radius: 50%;"
             />
             <a-avatar v-else>{{record.name}}</a-avatar>
@@ -58,13 +61,13 @@
 </template>
 
 <script setup>
-import { ref, inject, onMounted } from "vue";
 import { DeleteOutlined, EditOutlined, ManOutlined, WomanOutlined, RobotOutlined } from '@ant-design/icons-vue';
 import PhCard from "@components/ph_inputs/PhCard.vue";
 import PhViewLayout from "@components/ph_inputs/PhViewLayout.vue";
 import { message } from "ant-design-vue";
 import UserModal from "@view/user/management/components/UserModal.vue";
-import dayjs from "dayjs"; // 直接引用组件
+import dayjs from "dayjs";
+import EasyUserModal from "./components/EasyUserModal.vue"; // 直接引用组件
 
 // 注入 API 和资源 URL
 const api = inject('api');
@@ -76,7 +79,7 @@ const activeUser = ref(null);
 
 // 表格列定义
 const columns = [
-  { title: '用户编号', dataIndex: 'id', key: 'id', width: 300 },
+  { title: '用户编号', dataIndex: 'uuid', key: 'uuid', width: 300 },
   { title: '姓名', dataIndex: 'name', key: 'name' },
   { title: '性别', dataIndex: 'sex', key: 'sex',width: 60 },
   { title: '生日', dataIndex: 'birthday', key: 'birthday' },

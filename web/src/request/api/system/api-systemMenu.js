@@ -1,4 +1,4 @@
-import myAxios from '@request/axios.js';
+import myAxios from '@request/axios.jsx';
 import {BaseApi} from "@request/api/baseApi";
 
 export default class extends BaseApi{
@@ -6,7 +6,7 @@ export default class extends BaseApi{
         super('Menu');
     }
     GetAntMenuData =  () =>{
-        console.log('获取菜单')
+        // console.log('获取菜单')
         return myAxios({
             method:'get',
             url:`/Menu/GetAntMenuData`

@@ -12,10 +12,7 @@
 
 
 <script setup>
-import {reactive, ref, watch, h, onMounted, inject} from 'vue';
-import {MailOutlined, AppstoreOutlined, SettingOutlined,FileOutlined} from '@ant-design/icons-vue';
-import router from "@/router";
-
+import {MailOutlined, AppstoreOutlined, SettingOutlined,FileOutlined,ReadOutlined} from '@ant-design/icons-vue';
 const emits = defineEmits(['handleClick'])
 const selectedKeys = ref(['1']);
 const openKeys = ref(['sub1']);
@@ -24,7 +21,6 @@ const api = inject('api')
 // 定义一个测试数据数组
 const menuData = ref([])
 
-
 function getItem(label, key, icon, children, type) {
   return {key, icon, children, label, type};
 }
@@ -32,10 +28,11 @@ function getItem(label, key, icon, children, type) {
 // 定义一个映射字符串到图标组件的函数
 function getIcon(iconName) {
   const icons = {
-    FileOutlined: FileOutlined,
-    MailOutlined: MailOutlined,
-    AppstoreOutlined: AppstoreOutlined,
-    SettingOutlined: SettingOutlined,
+    FileOutlined,
+    MailOutlined,
+    AppstoreOutlined,
+    SettingOutlined,
+    ReadOutlined,
     // 如果有更多的图标，可以继续添加
   };
   return icons[iconName];

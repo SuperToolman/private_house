@@ -1,7 +1,4 @@
 <script setup>
-import {inject, onMounted, ref, watch} from "vue";
-import {CloseOutlined} from '@ant-design/icons-vue'
-
 const api = inject('api')
 const props = defineProps({
   tagList:{type:Array},
@@ -30,7 +27,10 @@ const handleChoseRecommend = (tag)=>{
   return false
 }
 const isTagActive = (tag)=>{
-  return props.tagList.includes(tag);
+  if (props.tagList){
+    return props.tagList.includes(tag);
+  }
+  return false
 }
 
 watch(props.tagList,()=>{
@@ -38,6 +38,7 @@ watch(props.tagList,()=>{
 })
 
 onMounted(()=>{
+  console.log(props.tagList)
   api.videoTagApi.Get().then(res=>{
     recommendTagList.value = res.data
   })
@@ -59,7 +60,7 @@ onMounted(()=>{
         <div class="input-instance">
           <input data-v-4f2d07f8="" type="text" maxlength="20" placeholder="按回车键Enter创建标签" class="input-val" @keydown="handleKeyDownEnter">
         </div>
-        <p data-v-4f2d07f8="" class="tag-last-wrp"> 还可以添加{{10 - tagList.length}}个标签 </p>
+        <p v-if="tagList" class="tag-last-wrp"> 还可以添加{{10 - tagList.length}}个标签 </p>
       </div>
 
     </div>

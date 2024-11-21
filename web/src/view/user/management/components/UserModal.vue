@@ -1,11 +1,10 @@
 <script setup>
 import dayjs from 'dayjs';
-import {LockOutlined, MailOutlined, ManOutlined, PhoneOutlined, RobotOutlined, UserOutlined, WomanOutlined} from "@ant-design/icons-vue";
-import {computed, ref, watch} from "vue";
 import AvatarUploader2 from "@view/user/management/components/AvatarUploader2.vue";
 import {api} from "@request/mangement";
 import {message} from "ant-design-vue";
 import PhSpace from "@components/ph_inputs/PhSpace.vue";
+import {v4 as uuidv4} from "uuid";
 
 // 接收 props 和 emits
 const emits = defineEmits(['handleClose']);
@@ -34,13 +33,20 @@ const handleSubmit = async () => {
   if (avatarUploaderRef.value) {
     await avatarUploaderRef.value.sureSava();
 
-    const apiMethod = formState.value.id ? api.userApi.UpdateAndUploadAvatar : api.userApi.AddAndUploadAvatar;
-    apiMethod(avatarFile.value,formState.value).then(res => {
+    //提交表单
+    const apiMethod = formState.value.id ? api.userApi.Update : api.userApi.Add;
+    console.log(formState.value)
+    apiMethod(formState.value).then(res => {
       if (res.isSuccess) {
         message.success(formState.value.id ? "更新成功" : "添加成功");
         handleClose()
       }
     });
+
+    //提交头像文件
+    api.userApi.UploadAvatar(avatarFile.value,formState.value.uuid).then(res=>{
+      if(!res.isSuccess) message.error(res.message)
+    })
   } else {
     console.error('子组件未正确挂载');
   }
@@ -51,7 +57,7 @@ const handleClose = ()=>{
 
 // 监听 props.user 变化并初始化 formState
 watch(() => props.user, (newUser) => {
-  formState.value = newUser? {...newUser}:{id: '', name: "", eMail: "", phone: "", password: "", birthday: '', coin: 0, level: 1, nowExp: 0, nextExp: 0, sign: "", sex: "", identityCard: "", avatarImageUrl: '',haveAvatar:false}
+  formState.value = newUser? {...newUser}:{uuid: uuidv4(), name: "", eMail: "", phone: "", password: "", birthday: new Date().toLocaleDateString('en-CA'), coin: 0, level: 1, nowExp: 0, nextExp: 0, sign: "", sex: "", identityCard: "", avatarImageUrl: '',haveAvatar:false}
 }, {immediate: true});//这是 watch 选项的一部分，表示在初始化时（即 watch 被设置后立即）也会执行一次回调函数。这样，formState.value 会在组件挂载时立即根据 newUser 的值进行一次初始化设置。
 
 </script>
@@ -69,8 +75,8 @@ watch(() => props.user, (newUser) => {
 
     <!--表单-->
     <a-form :model="formState" :label-col="{ style: {width: '50px'} }">
-      <a-form-item label="ID" name="id" :style="{display: formState.id?'flex':'none'}">
-        <a-input v-model:value="formState.id" :disabled="true"/>
+      <a-form-item label="临时ID" name="uuid">
+        <a-input v-model:value="formState.uuid" :disabled="true"/>
       </a-form-item>
       <ph-space>
         <a-form-item label="名称" name="name" :rules="[{ required: true, message: '请输入用户名！' }]">

@@ -1,4 +1,4 @@
-import myAxios from "@request/axios.js";
+import myAxios from "@request/axios.jsx";
 import {v4 as uuidv4} from 'uuid';
 
 export class BaseApi {

@@ -19,13 +19,13 @@
         </a-select>
       </div>
     </template>
-    <ph-card style="padding: 15px">
+    <div style="padding: 6px">
       <div class="videos-container">
         <div class="video-wrap" v-for="videoEntity in videoList" :key="videoEntity">
           <VideoCard :video-entity="videoEntity" @handle-delete-video-done="(videoId)=>videoList = videoList.filter(x=>x.id !== videoId)"/>
         </div>
       </div>
-    </ph-card>
+    </div>
   </ph-view-layout>
 </template>
 

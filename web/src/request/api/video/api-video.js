@@ -1,4 +1,4 @@
-import myAxios from '@request/axios.js';
+import myAxios from '@request/axios.jsx';
 import {BaseApi} from "@request/api/baseApi";
 import {v4 as uuidv4} from "uuid";
 
@@ -22,7 +22,7 @@ export default class extends BaseApi{
     }
 
     UploadToTemp = (file,config = {}) =>{
-        console.log('开始上传文件',file)
+        // console.log('开始上传文件',file)
         const formData = new FormData()
         formData.append('file',file)
         return myAxios({
@@ -37,7 +37,7 @@ export default class extends BaseApi{
         })
     }
 
-    GetByCombinationQuery = (areaId='',auditStatus=-1,countOption = -1) =>{
+    GetByCombinationQuery = (areaId=-1,auditStatus=-1,countOption = -1) =>{
         return myAxios({
             method: 'get',
             url: `/Video/GetByCombinationQuery?areaId=${areaId}&videoAuditStatus=${auditStatus}&videoCountOption=${countOption}`,

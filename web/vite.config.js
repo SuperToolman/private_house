@@ -6,10 +6,12 @@ import Components from 'unplugin-vue-components/vite';
 import AutoImport from "unplugin-auto-import/vite"
 import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
 import path from 'path'
+import vueJsx from '@vitejs/plugin-vue-jsx';
 
 export default defineConfig({
   plugins: [
     vue(), // 启用 Vue 插件
+    vueJsx(), // 启用 JSX 支持
     Components({
       resolvers: [
         AntDesignVueResolver({importStyle: false, resolveIcons:true}),// 使用 Ant Design Vue 组件库的解析器，不使用 CSS in JS

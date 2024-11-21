@@ -1,7 +1,4 @@
 <script setup>
-import {useRouter} from "vue-router";
-import PhPageHeader from "@components/ph_inputs/PhPageHeader.vue";
-
 const router = useRouter()
 const props = defineProps({
   title:{type:String,default:'Title'},
@@ -24,19 +21,20 @@ const handleBack = ()=>{
   <ph-page-header :title="title" :sub-title="subTitle">
     <slot name="view-tool"></slot>
   </ph-page-header>
-<!--  <a-page-header style="border: 1px solid rgb(235, 237, 240)" :title="title" :sub-title="subTitle" @back="handleBack">-->
-<!--    <template #extra>-->
-<!--      <slot name="form-tools">-->
 
-<!--      </slot>-->
-<!--&lt;!&ndash;      <a-button v-if="isAdd" type="primary" @click="addEvent">添加</a-button>&ndash;&gt;-->
-<!--    </template>-->
-<!--  </a-page-header>-->
-  <slot>
+  <div class="view-body">
+    <slot class="view-body-content">
 
-  </slot>
+    </slot>
+  </div>
+
 </template>
 
 <style scoped>
-
+.view-body{
+  min-height: 1vh;
+  .view-body-content{
+    min-height: 1vh;
+  }
+}
 </style>

@@ -9,11 +9,13 @@ const videoId = ref(null)
 const videoEntity = ref(null)
 const videoReviewList = ref([])
 const videoTagList = ref([])
+const videoAreaName = ref('')
 const pushTagInputSwitch = ref(false)
 const pushTagInput = ref('')
 const initVideoData = ()=>{
   api.videoApi.GetById(videoId.value).then(res=>{
     videoEntity.value = res.data
+    videoAreaName.value = videoEntity.value.videoUrl.includes("Temp") ? "审核池" : videoEntity.value.videoUrl.split('/').slice(1, 3).join(' → ');
     if (videoEntity.tagString !== "")
       videoTagList.value = videoEntity.value.tagString.split(',')
   })
@@ -49,10 +51,14 @@ const handleRemoveTag = (tag) =>{
   })
 }
 
+const initAreaName = (areaId)=>{
+
+}
 onMounted(()=>{
   videoId.value = route.params.videoId
   initVideoData()
   initHistoryAudit()
+
 })
 
 </script>
@@ -139,6 +145,7 @@ onMounted(()=>{
               </div>
             </div>
           </a-descriptions-item>
+          <a-descriptions-item label="分区" :span="3">{{videoAreaName}}</a-descriptions-item>
         </a-descriptions>
       </ph-card>
 

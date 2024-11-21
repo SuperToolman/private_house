@@ -1,5 +1,4 @@
 <script setup>
-import {inject, onBeforeMount, onMounted, ref} from 'vue';
 import CollapsePanel from "@view/video/area/components/collapse-panel.vue";
 import Form from './components/form.vue'
 
@@ -44,25 +43,26 @@ onBeforeMount(()=>{
 </script>
 
 <template>
-  <!--头部-->
-  <a-page-header style="border: 1px solid rgb(235, 237, 240)" :title="'视频分区管理'"
-                 :sub-title="'管理和查看视频的分区信息信息'" @back="() => null">
-    <template #extra>
+  <PhViewLayout :title="'视频分区管理'" :sub-title="'管理和查看视频的分区信息信息'">
+    <!--头部-->
+    <template #view-tool>
       <a-button type="primary" @click="Add">添加</a-button>
     </template>
-  </a-page-header>
+    <PhCard>
+      <!--内容-->
+      <div class="content">
+        <div class="left">
+          <collapse-panel @handelEdit="Edite" @handelDelete="Delete" :chides="collapseData"/>
+        </div>
+        <div class="right">
+          <a-card>
+            测试
+          </a-card>
+        </div>
+      </div>
+    </PhCard>
+  </PhViewLayout>
 
-  <!--内容-->
-  <div class="content">
-    <div class="left">
-      <collapse-panel @handelEdit="Edite" @handelDelete="Delete" :chides="collapseData"/>
-    </div>
-    <div class="right">
-      <a-card>
-        测试
-      </a-card>
-    </div>
-  </div>
 
 
 
@@ -79,6 +79,7 @@ onBeforeMount(()=>{
   flex-grow: 1;
 }
 .content .right{
+  margin-left: 20px;
   min-width: 620px;
 }
 </style>

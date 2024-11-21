@@ -1,4 +1,4 @@
-import myAxios from "../../axios.js";
+import myAxios from "../../axios.jsx";
 import {BaseApi} from "@request/api/baseApi";
 
 export default class extends BaseApi{
