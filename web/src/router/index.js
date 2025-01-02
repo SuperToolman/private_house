@@ -2,7 +2,7 @@ import {createRouter, createWebHistory} from "vue-router";
 
 const routes = [
     {
-        path:'/user',component:()=>import('@view/user/index.vue'),
+        path:'/user',component:()=>import('@view/user/Index.vue'),
         // redirect: "/platform/home",
         children: [
             {
@@ -11,11 +11,11 @@ const routes = [
                     { path: "add", component: () => import('@view/user/management/components/UserModal.vue')}
                 ]
             },
-            {path: "tag", component: () => import('@view/user/tag/index.vue'),},
+            {path: "tag", component: () => import('@view/user/tag/Index.vue'),},
         ]
     },
     {
-        path:'/video',component:()=>import('@view/video/index.vue'),
+        path:'/video',component:()=>import('@view/video/Index.vue'),
         children: [
             {path: "management", component: () => import('@view/video/management/Index.vue'),},
             {path: ":videoId", component: () => import('@view/video/management/Info.vue'),},
@@ -33,7 +33,7 @@ const routes = [
         ]
     },
     {
-        path:'/system',component:()=>import('@view/video/index.vue'),
+        path:'/system',component:()=>import('@view/video/Index.vue'),
         children: [
             {
                 path: "config", component: () => import('@view/system/config/Index.vue'),
@@ -47,11 +47,9 @@ const routes = [
             {path: "menu", component: () => import('@view/system/menu/Index.vue'),},
             {path: "tag", component:()=>import('@view/system/tag/Index.vue')},
             {path:'api_info',component:()=>import('@view/system/api_info/Index.vue')},
-
+            {path:'file',component:()=>import('@view/file/Index.vue'),},
         ]
     },
-    {
-        path:'/file',component:()=>import('@view/file/Index.vue'),},
     {
         path:'/manga',component:()=>import('@view/manga/Index.vue'),
         children: [

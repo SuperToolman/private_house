@@ -2,13 +2,12 @@
 import VideoHelper from "@common/js/videoHelper";
 import DifferenceList from "@view/video/upload/components/DifferenceList.vue";
 import SelectPreview from "@view/video/upload/components/SelectPreview.vue";
+import {message} from "ant-design-vue";
 
 const api = inject('api')
-const videos = ref([])
 const videoPreviewTimeList = ref([])
-const handleUploadClick = ()=>{document.querySelector("#videoInput").click()}
 const videoDifferenceForm = ref({
-  id:'',
+  id:-1,
   userId:'',
   userEntity:'',
   title: '',
@@ -19,7 +18,13 @@ const videoDifferenceForm = ref({
   tagList: [],
   cover: null,
   desc: '',
+  videoType:1,
+  uuid:'',
 })
+
+const videos = ref([]) //弃用
+const handleUploadClick = ()=>{document.querySelector("#videoInput").click()}
+
 const handleFileChange = async(event)=>{
   const files = Array.from(event.target.files);
   videoDifferenceForm.value.title = files[0].name.substring(0,files[0].name.lastIndexOf('.'))
@@ -33,6 +38,8 @@ const handleFileChange = async(event)=>{
         videoPreviewTimeList.value.push(Math.random() * maxTime);
       }
     }
+
+    console.log(videoPreviewTimeList.value)
 
     files.forEach(file => {
       // 初始化表单和上传状态信息
@@ -49,7 +56,15 @@ const handleFileChange = async(event)=>{
         durationBySecond:0,
         cover: null,
         previews: [],
-        tempUrl:URL.createObjectURL(file)
+        coverUrl:'',
+        videoUrl:'',
+        auditStatus:0,
+        tempUrl:URL.createObjectURL(file),
+        videoAreaId:'',
+        videoAreaEntity: {parent:null, child:null},
+        videoType:1,
+        userId:'',
+        userEntity:'',
       });
     })
 
@@ -88,7 +103,12 @@ const handleFileChange = async(event)=>{
             }
           }).then(res => {
             video.status = 'done';
-            video.id = res.data.id;
+            video.title = res.data.title
+            video.uuid = res.data.uuid;
+            video.id = parseInt(res.data.id);
+            video.videoUrl = res.data.videoUrl
+            video.coverUrl = res.data.coverUrl
+            console.log('接收上传回调',video)
             // console.log(`上传成功: 文件ID - ${video.id}`);
           })
         } catch (error) {
@@ -99,19 +119,32 @@ const handleFileChange = async(event)=>{
     }
   }
 }
+const handleChoseCover = (cover)=>{
+  videoDifferenceForm.value.cover = cover.cover
+  for (const [index, video] of videos.value.entries()) {
+    video.cover = video.previews[cover.index]
+  }
+}
 
 const createPreviews = async (video)=>{
   const videoHelper = new VideoHelper(video.file)
   // 截取随机时间点的预览图
   for (let time of videoPreviewTimeList.value) {
     const res = await videoHelper.getPreview(time);
+    res.time = time
     video.previews.push(res);
   }
+  video.cover = video.previews[0]
 }
 
 const handleSelectUser = (userEntity) => {
   videoDifferenceForm.value.userEntity = userEntity
   videoDifferenceForm.value.userId = userEntity.id
+
+  videos.value.forEach(obj => {
+    obj.userEntity = userEntity
+    obj.userId = userEntity.id
+  });
 }
 const handleChangeTagList = (tagArray)=>{
   if(tagArray !== null && tagArray.length >0){
@@ -121,7 +154,48 @@ const handleChangeTagList = (tagArray)=>{
 const handleSelectArea = (areaEntity) => {
   videoDifferenceForm.value.videoAreaId = areaEntity.child.value
   videoDifferenceForm.value.videoAreaEntity = areaEntity;
+
+  videos.value.forEach(obj => {
+    obj.videoAreaId = areaEntity.child.value
+    obj.videoAreaEntity = areaEntity
+  });
+
   console.log('选中的分区', videoDifferenceForm.value.videoAreaEntity)
+}
+
+const handleIndexUp = (index)=>{
+  if (videos.value.length >1){
+    if (index !== 0){
+      //列表大于2且部位顶部则上升
+      const upContent = videos.value[index-1]
+      videos.value[index-1] = videos.value[index]
+      videos.value[index] = upContent
+      console.log('执行了上升操作',videos.value)
+    }
+  }
+}
+
+const handleIndexDown = (index)=>{
+  if (videos.value.length >1){
+    if (index !== videos.value.length-1){
+      //列表大于2且部位顶部则上升
+      const downContent = videos.value[index+1]
+      videos.value[index+1] = videos.value[index]
+      videos.value[index] = downContent
+      console.log('执行了下降操作',videos.value)
+    }
+  }
+}
+
+const handleSubmission = ()=>{
+  //提交数据
+  api.videoApi.SubmissionByDifference(videoDifferenceForm.value,videos.value).then(res=>{
+    if (res.isSuccess) message.success(res.message)
+  })
+  //上传头像
+  api.videoApi.UploadCover(videos.value[0].uuid,videoDifferenceForm.value.cover).then(res=>{
+    if (!res.isSuccess) message.error(res.message)
+  })
 }
 </script>
 
@@ -145,9 +219,10 @@ const handleSelectArea = (areaEntity) => {
           </a-form-item>
           <a-form-item label="封面" name="cover">
             <SelectPreview
-                :cover="videos[0].cover"
+                :cover="videoDifferenceForm.cover"
                 :previews="videos[0].previews"
-                @handle-upload-cover="(cover)=>videoDifferenceForm.cover"/>
+                @handle-upload-cover="(cover)=>videoDifferenceForm.cover = cover"
+                @handle-chose-cover="handleChoseCover"/>
           </a-form-item>
           <a-form-item label="标题" name="title">
             <a-input v-model:value="videoDifferenceForm.title"/>
@@ -175,22 +250,24 @@ const handleSelectArea = (areaEntity) => {
       </ph-card>
 
       <!--视频列表-->
-      <DifferenceList :video-list="videos"/>
+      <DifferenceList :video-list="videos" @handle-index-up="handleIndexUp" @handle-index-down="handleIndexDown"/>
 
       <!--action-->
       <ph-card>
         <div class="action-wrap">
-          <a-button type="primary">上传</a-button>
+          <a-button type="primary" @click="handleSubmission">提交</a-button>
           <a-button>取消</a-button>
         </div>
       </ph-card>
     </div>
     <!--不存在文件时-->
-    <div class="not-file-container" v-else>
-      <img class="update_icon" src="../../../assets/HarmonyOS_Icons/ic_public_upload.svg">
-      <span>拖拽此处也可以上传</span>
-      <div class="btn_upload" @click="handleUploadClick">上传差分视频</div>
-    </div>
+    <PhCard v-else>
+      <div class="not-file-container">
+        <img class="update_icon" src="@assets/HarmonyOS_Icons/ic_public_upload.svg" alt="">
+        <span>拖拽此处也可以上传</span>
+        <div class="btn_upload" @click="handleUploadClick">上传差分视频</div>
+      </div>
+    </PhCard>
   </PhViewLayout>
 </template>
 

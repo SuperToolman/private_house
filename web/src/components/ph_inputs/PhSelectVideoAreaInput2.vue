@@ -71,7 +71,10 @@ const handleShowModel = ()=>{
   showModel.value = true
 }
 onMounted(async () => {
-  treeData.value = (await api.videoAreaApi.LoadAntTreeSelected()).data
+  const res = await api.videoAreaApi.LoadAntTreeSelected()
+  console.log(res)
+  treeData.value = res.data
+
   watch(props.choseArea, () => {
     console.log('监听到props的变动',props.choseArea)
     if (props.choseArea.child) {

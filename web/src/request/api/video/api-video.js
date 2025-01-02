@@ -6,20 +6,20 @@ export default class extends BaseApi{
     constructor() {
         super('Video');
     }
-    Submission = formData =>{
-        console.log('提交的投稿',formData)
-        return myAxios({
-            method: 'post',
-            url: `/Video/Submission`,
-            data: {userId:formData.userId,
-            videoFileList:formData.videoFileList[0],
-            coverFileList:formData.coverFileList[0]},
-            headers: {
-                'Content-Type': 'multipart/form-data' // 设置请求头为 multipart/form-data，表示上传文件
-            },
-            maxContentLength: Infinity, // 设置最大内容长度为无限大
-        })
-    }
+    // Submission = formData =>{
+    //     console.log('提交的投稿',formData)
+    //     return myAxios({
+    //         method: 'post',
+    //         url: `/Video/Submission`,
+    //         data: {userId:formData.userId,
+    //         videoFileList:formData.videoFileList[0],
+    //         coverFileList:formData.coverFileList[0]},
+    //         headers: {
+    //             'Content-Type': 'multipart/form-data' // 设置请求头为 multipart/form-data，表示上传文件
+    //         },
+    //         maxContentLength: Infinity, // 设置最大内容长度为无限大
+    //     })
+    // }
 
     UploadToTemp = (file,config = {}) =>{
         // console.log('开始上传文件',file)
@@ -50,19 +50,45 @@ export default class extends BaseApi{
         })
     }
 
-    SubmissionForReview = (video) =>{
-        console.log(video)
-        const data = {
-            cover:video.cover.blob,
-            video:null
-        }
-        console.log(data)
+    Submission = (video) =>{
+        console.log('投稿焦点视频表单：', video)
         const {cover,file,previews,...info} = video
-        data.video = info;
         return myAxios({
             method: 'post',
-            url: `/Video/SubmissionForReview`,
-            data: data,
+            url: `/Video/Submission`,
+            data: info,
+        })
+    }
+
+    SubmissionByDifference = (videoListByDifference, videos) => {
+        // 创建 videos 的副本，并将 videoListByDifference 插入到副本的开头
+        const videosCopy = [videoListByDifference, ...videos];
+
+        console.log('投稿差异视频表单：', videosCopy);
+
+        return myAxios({
+            method: 'post',
+            url: `/Video/SubmissionByDifference`, // 请求 URL
+            data: videosCopy, // 传递副本数据
+        });
+    }
+
+    PushTagByString =(tagString,videoId)=>{
+        return myAxios({
+            method:'post',
+            url:`/Video/PushTagByString?tagString=${tagString}&videoId=${videoId}`,
+        })
+    }
+
+    UploadCover=(videoUUID,coverFile)=>{
+        console.log(coverFile)
+        // console.log('开始上传文件',file)
+        const formData = new FormData()
+        formData.append('file',coverFile.blob,`${videoUUID}.webp`)
+        return myAxios({
+            method: 'post',
+            url: `/Video/UploadCover`,
+            data:formData,
             headers: {
                 'Content-Type': 'multipart/form-data' // 设置请求头为 multipart/form-data，表示上传文件
             },
@@ -70,10 +96,17 @@ export default class extends BaseApi{
         })
     }
 
-    PushTagByString =(tagString,videoId)=>{
+    GetByIdWithType=(videoId,videoType)=>{
         return myAxios({
-            method:'post',
-            url:`/Video/PushTagByString?tagString=${tagString}&videoId=${videoId}`,
+            method:'get',
+            url:`/Video/IdWithType?videoId=${videoId}&videoType=${videoType}`
+        })
+    }
+
+    GetByUUID = (uuid)=>{
+        return myAxios({
+            method:'get',
+            url:`/Video/UUID?uuid=${uuid}`
         })
     }
 }

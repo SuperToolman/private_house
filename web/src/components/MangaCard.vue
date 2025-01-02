@@ -4,11 +4,12 @@ const props = defineProps({
   width:{type:Number},
   height:{type:Number}
 })
+const resourceUrl = inject('resourceUrl')
 const getRandomColor = () => {return getRandomColorCode();}
 const loading = ref(true)
 const tagList = ref([])
 onMounted(()=>{
-  if (props.mangaEntity.tagString !== ''){
+  if (props.mangaEntity.tagString){
     tagList.value = props.mangaEntity.tagString.split(',')
   }
 })
@@ -21,7 +22,10 @@ onMounted(()=>{
     'height':`${height}px`
   }">
     <div class="cover">
-      <PhImage :preview="false" src="/src/assets/test.jpg"/>
+      <div style="width: 240px;height: 314px">
+        <PhImage v-if="mangaEntity.haveCover" :preview="false" :src="`${resourceUrl}/${mangaEntity.savePath}/${mangaEntity.uuid}/cover.webp`"/>
+        <PhImage v-else :preview="false" :src="`${resourceUrl}/${mangaEntity.savePath}/${mangaEntity.uuid}/00001.webp`"/>
+      </div>
       <div class="info-overlay">
         <div class="info-wrap">
           <div class="title-overlay">

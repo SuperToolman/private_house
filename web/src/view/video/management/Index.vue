@@ -19,13 +19,16 @@
         </a-select>
       </div>
     </template>
-    <div style="padding: 6px">
+    <PhCard v-if="videoList.length">
       <div class="videos-container">
         <div class="video-wrap" v-for="videoEntity in videoList" :key="videoEntity">
           <VideoCard :video-entity="videoEntity" @handle-delete-video-done="(videoId)=>videoList = videoList.filter(x=>x.id !== videoId)"/>
         </div>
       </div>
-    </div>
+    </PhCard>
+    <PhCard v-else>
+      <a-empty />
+    </PhCard>
   </ph-view-layout>
 </template>
 
@@ -34,14 +37,16 @@ import VideoCard from "./components/VideoCard.vue";
 
 const api = inject('api');
 const videoList = ref([])//定义表格的数据
-const videoAreaId = ref('')
+const videoAreaId = ref('-1')
 const auditStatus = ref("-1")
 const countOption = ref("0")
 const dataInit = () => {
   api.videoApi.GetByCombinationQuery(videoAreaId.value,auditStatus.value,countOption.value).then(res => {
-    if (res.isSuccess)
+    if (res.isSuccess){
       videoList.value = res.data
-    console.log(videoList.value)
+      console.log(videoList.value)
+    }
+
   })
 }
 
@@ -58,8 +63,8 @@ onMounted(() => {
 <style scoped>
 .videos-container{
   //padding: 20px;
-  grid-column: span 6;
-  grid-template-columns: repeat(6, 1fr);
+  grid-column: span 5;
+  grid-template-columns: repeat(5, 1fr);
   display: grid;
   position: relative;
   width: 100%;

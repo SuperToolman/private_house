@@ -19,9 +19,11 @@
     "jquery": "^3.7.1",
     "less": "^4.2.0",
     "lodash-es": "^4.17.21",
-    "pinia": "^2.1.7",
+    "pinia": "^2.3.0",
+    "pinia-plugin-persistedstate": "^4.2.0",
     "uuid": "^9.0.1",
     "vue": "^3.2.16",
+    "vue-lazyload": "^3.0.0",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {

@@ -4,6 +4,7 @@ import {message} from "ant-design-vue";
 const props = defineProps({
   videoList:{type:Array,default:[]}
 })
+const emits = defineEmits(['handleIndexUp','handleIndexDown'])
 const contrastModelOpen = ref(false)
 const coverEntity = ref({
   dataURL:null,
@@ -72,7 +73,7 @@ watch(props,()=>{
       <a-button type="primary" @click="contrastModelOpen = true">对比视频</a-button>
     </a-space>
     <ul>
-      <li v-for="videoEntity in videoList" :key="videoEntity.id">
+      <li v-for="(videoEntity,index) in videoList" :key="videoEntity.id">
         <div class="difference-item">
           <div class="cover-wrap">
             <div v-if="videoEntity.cover" class="cover-upload" :style="{
@@ -87,7 +88,7 @@ watch(props,()=>{
             <a-space direction="vertical">
               <a-input style="width: 200px" v-model:value="videoEntity.title" placeholder="差分名称" />
               <div class="task-progress">
-                <img class="task-progress-icon" src="/src/assets/HarmonyOS_Icons/ic_normal_white_grid_video.svg">
+                <img class="task-progress-icon" src="@assets/HarmonyOS_Icons/ic_normal_white_grid_video.svg" alt="">
 
                 <div class="task-progress-content">
                   <div class="task-progress-info">
@@ -116,6 +117,8 @@ watch(props,()=>{
               </div>
             </a-space>
             <div>
+              <a-button @click="emits('handleIndexUp',index)">上升</a-button>
+              <a-button @click="emits('handleIndexDown',index)">下降</a-button>
               <a-popconfirm
                 title="确定要删除该视频吗？"
                 ok-text="删除"
@@ -166,6 +169,11 @@ watch(props,()=>{
     border-radius: 10px;
     overflow: hidden;
     background-color: #888888;
+
+    .cover-upload{
+      height: 100%;
+      width: 100%;
+    }
   }
   .form-wrap{
     flex: 1;

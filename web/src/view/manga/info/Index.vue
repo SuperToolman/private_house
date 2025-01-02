@@ -1,17 +1,34 @@
 <script setup>
-
-import InfoComment from "@view/manga/info/components/InfoComment.vue";
-import InfoChapter from "@view/manga/info/components/InfoChapter.vue";
-import InfoRecommend from "@view/manga/info/components/InfoRecommend.vue";
+import {message} from "ant-design-vue";
+import InfoChapter from "./components/InfoChapter.vue";
+import InfoRecommend from "./components/InfoRecommend.vue";
+import InfoComment from "./components/InfoComment.vue";
+import {formatFileSize} from "../../../common/js/utils";
 
 const route = useRoute()
+const router = useRouter()
 const mangaId = ref('')
-const mangaEntity = ref(null)
+const mangaEntity = ref({})
+const api = inject('api')
+const resourceUrl = inject('resourceUrl')
 
 const getRandomColor = () => {return getRandomColorCode();}
-
-onMounted(()=>{
+const dataInit = ()=>{
+  api.mangaApi.GetById(mangaId.value).then(res=>{
+    if (res.isSuccess){
+      console.log('获取漫画信息：',res.data)
+      mangaEntity.value = res.data
+    }
+    else
+      message.error(res.message)
+  })
+}
+const handleRead = ()=>{
+  router.push('/manga/' + mangaId.value)
+}
+onMounted(async () => {
   mangaId.value = route.params.mangaId
+  dataInit()
 })
 
 </script>
@@ -19,17 +36,21 @@ onMounted(()=>{
 <template>
   <PhCard :title="'漫画信息'">
     <div class="manga-info-wrap">
-      <PhImage :src="'/src/assets/test.jpg'"/>
+      <div style="width: 270px;height: 373px">
+        <PhImage v-if="mangaEntity.haveCover" :preview="false" :src="`${resourceUrl}/${mangaEntity.savePath}/${mangaEntity.uuid}/cover.webp`"/>
+        <PhImage v-else :preview="false" :src="`${resourceUrl}/${mangaEntity.savePath}/${mangaEntity.uuid}/00001.webp`"/>
+      </div>
       <div class="manga-info">
         <div class="title">
-          <div class="title-text">测试标题</div>
+          <div class="title-text">{{mangaEntity.title}}</div>
           <div class="score">
             <div class="score_title">2.5分</div>
             <a-rate :value="2" disabled allow-half/>
             <div class="score_title">，共57人评价</div>
           </div>
         </div>
-        <div class="sub-title">作者：
+        <div class="sub-title">
+          作者：
           <a :href="''">王某某</a>，
           <a :href="''">里水平</a>
         </div>
@@ -52,11 +73,12 @@ onMounted(()=>{
           </div>
         </div>
         <div class="desc">
-          现身为卑微家奴的罗征，本身家中大少爷，因家族败落，妹妹被强大势力囚禁，无奈只得听命于人。可是天无绝人之路，父亲留给他的古书中竟然暗藏炼器神法，可将人炼制成器！而隐藏在这背后的神秘力量到底是什么？这是一场与命运的较量。
+          <span v-if="mangaEntity.description">{{mangaEntity.description}}</span>
+          <span v-else>暂无简介</span>
         </div>
 
         <div class="action">
-          <a-button>开始阅读</a-button>
+          <a-button @click="handleRead()" type="primary">开始阅读</a-button>
           <a-button>续看xxx</a-button>
           <a-button>编辑信息</a-button>
           <a-button>删除</a-button>
@@ -64,18 +86,19 @@ onMounted(()=>{
       </div>
       <PhCard>
         <a-descriptions :bordered="true">
+          <a-descriptions-item :span="4" label="id - uuid">{{mangaEntity.id}} - {{ mangaEntity.uuid }}</a-descriptions-item>
           <a-descriptions-item :span="4" label="语言">中文</a-descriptions-item>
-          <a-descriptions-item :span="4" label="页数">314</a-descriptions-item>
-          <a-descriptions-item :span="4" label="文件大小">24Mb</a-descriptions-item>
+          <a-descriptions-item :span="4" label="页数">{{mangaEntity.pageNumber}}</a-descriptions-item>
+          <a-descriptions-item :span="4" label="文件大小">{{formatFileSize(parseInt(mangaEntity.fileSize))}}</a-descriptions-item>
           <!--          <a-descriptions-item label="章节数">XX</a-descriptions-item>-->
-          <a-descriptions-item :span="4" label="上传时间">2024-10-16</a-descriptions-item>
+          <a-descriptions-item :span="4" label="上传时间">{{mangaEntity.addTime}}</a-descriptions-item>
           <a-descriptions-item :span="4" label="出版时间">2024-10-16</a-descriptions-item>
         </a-descriptions>
       </PhCard>
     </div>
   </PhCard>
   <div class="other-info-wrap">
-<!--连载才使用章节-->
+    <!--连载才使用章节-->
     <div class="left">
       <InfoChapter v-if="true" :manga-id="mangaId" style="flex: 1"/>
       <InfoRecommend/>

@@ -4,7 +4,8 @@ import {flattenAndJoin} from "@common/js/utils";
 
 
 axios.defaults.withCredentials = true// Cookie跨域
-axios.defaults.baseURL = "https://localhost:7122/api";
+// axios.defaults.baseURL = "https://localhost:7122/api";
+axios.defaults.baseURL = "https://localhost:7268/api";
 // axios.defaults.baseURL = "https://localhost:44311/api";
 
 axios.defaults.headers = {
@@ -102,6 +103,7 @@ function errorHandle(response) {
             break;
         case 500:
             notification['error']({message: 'Error 500', description: `服务器错误！${message}`,});
+            console.log('报错500')
             break;
         default:
             notification['error']({message: 'Error', description: `${'其它错误，状态码【' + status + '】：' + message}`,});

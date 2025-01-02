@@ -7,7 +7,7 @@ const preNodeId = ref([])
 const areaSelected = ref([])
 
 onMounted(async () => {
-  areaSelected.value.push({label:'全部分区',value:''})
+  areaSelected.value.push({label:'全部分区',value:'-1'})
   const data = (await api.videoAreaApi.LoadSelectedData()).data
   areaSelected.value.push(...data)
 })

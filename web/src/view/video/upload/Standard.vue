@@ -1,11 +1,15 @@
 <script setup>
 import VideoHelper from "@common/js/videoHelper";
-import localStorageHelper from "@common/js/localStorageHelper";
 import VideoManuscriptManagement from "./components/VideoManuscriptManagement.vue";
 import UploadTask from "./components/UploadTask.vue";
 import UploadTaskForm from "./components/UploadTaskForm.vue";
-import LocalStoreHelper from "@common/js/localStorageHelper";
 import {message} from "ant-design-vue";
+import {
+  addItemToLocalVideoArray,
+  getLocalVideoArray,
+  removeItemByIdFromVideoArray,
+  removeVideoArray
+} from "../../../common/js/storageUtils";
 
 const api = inject('api');
 const videos = ref([]);
@@ -32,13 +36,16 @@ const handleFileChange = async (event) => {
         size:file.size,
         fileName:file.name,
         durationBySecond:0,
+        recommendTagList:[],
 
         // 视频信息表单
         id: '',
+        uuid:'',
         userId:'',
         userEntity:'',
         title: file.name.split('.')[0],
         type: '0',
+        videoType:0,
         videoAreaId: '',
         videoAreaEntity: {parent:null, child:null},
         tagString: '',
@@ -82,13 +89,22 @@ const handleFileChange = async (event) => {
               video.loaded = (loaded / 1024 / 1024).toFixed(1);
               video.progress = Math.round((loaded / total) * 100);
             }
-          }).then(res => {
-            video.status = 'done';
-            video.uuid = res.data.id;
-            // 复制对象，并移除file、previews属性
-            const {file, previews, cover, ...rest} = video;
-            localStorageHelper.addItemToLocalVideoArray({...rest, cover: null, previews: []})
-            console.log(`上传成功: 文件ID - ${video.uuid}`);
+          }).then(async res => {
+            console.log(res)
+            if (res.isSuccess) {
+              video.status = 'done'
+              video.id = res.data.id
+              video.uuid = res.data.uuid
+
+              //获取推荐标签
+              await api.systemTagApi.GetRandomByCount(20).then(res => {
+                video.recommendTagList = res.data
+              })
+              // 复制对象，并移除file、previews属性
+              const {file, previews, cover, ...rest} = video;
+              addItemToLocalVideoArray({...rest, cover: null, previews: []})
+              console.log(`上传成功: 文件ID - ${video}`);
+            }
           })
         } catch (error) {
           video.status = 'error';
@@ -111,13 +127,12 @@ const createPreviews = async (video) => {
   }
 }
 const handleInitDataByLocalStorage = () => {
-  const localData = localStorageHelper.getItem('video_upload_record')
+  const localData = getLocalVideoArray()
   activeVideoIndex.value = localData.length - 1
   videos.value = localData
 }
 const handleClearLocalStorage = async () => {
-  const localData = localStorageHelper.getItem('video_upload_record');
-
+  const localData = getLocalVideoArray();
   if (localData && Array.isArray(localData)) {
     // 使用for...of循环来处理异步删除请求
     for (const video of localData) {
@@ -127,12 +142,8 @@ const handleClearLocalStorage = async () => {
         console.error(`Error deleting video with ID ${video.id}`, error);
       }
     }
-
-    // 删除localStorage中的记录
-    localStorageHelper.removeItem('video_upload_record');
-
-    // 清空本地文件列表
-    localFileList.value = null;
+    removeVideoArray() ;// 删除localStorage中的记录
+    localFileList.value = null;// 清空本地文件列表
   }
 }
 const handleActivateIndexChange = (index)=>{
@@ -147,19 +158,37 @@ const handleSelectArea = (areaEntity) => {
   videos.value[activeVideoIndex.value].videoAreaEntity = areaEntity;
   console.log('选中的分区', videos.value[activeVideoIndex.value].videoAreaEntity)
 }
+const handleCancel = ()=>{
+  console.log(videos.value[activeVideoIndex.value].id)
+  api.videoApi.DeleteById(videos.value[activeVideoIndex.value].id).then(res=>{
+    if (res.isSuccess){
+      //移除本地表单数据
+      removeItemByIdFromVideoArray(videos.value[activeVideoIndex.value].id)
+      //将该视频移除任务列表
+      videos.value = videos.value.filter(x=>x.id !== videos.value[activeVideoIndex.value].id)
+      const backIndex = activeVideoIndex.value - 1;
+      if (backIndex === -1) {
+        //移除的视频为唯一任务
+        videos.value = []
+        message.success(res.message)
+      }
+    }
+  })
+}
 const handleOnlySubmission = () => {
-  console.log('投稿焦点视频表单：', videos.value[activeVideoIndex.value])
-  api.videoApi.SubmissionForReview(videos.value[activeVideoIndex.value]).then(res => {
+  //上传视频表单
+  api.videoApi.Submission(videos.value[activeVideoIndex.value]).then(res => {
     //投稿成功删除本地存储
     try {
       if (res.isSuccess) {
         //上传成功
         //移除本地表单数据
-        LocalStoreHelper.removeItemByIdFromVideoArray(videos.value[activeVideoIndex.value].id)
+        removeItemByIdFromVideoArray(videos.value[activeVideoIndex.value].id)
         //将该视频移除任务列表
-        manuscriptVideos.value.push(videos.value[activeVideoIndex.value])
         videos.value = videos.value.filter(x=>x.id !== videos.value[activeVideoIndex.value].id)
         const backIndex = activeVideoIndex.value - 1;
+        //刷新审核列表
+        initManuscriptVideos()
         if (backIndex === -1) {
           //移除的视频为唯一任务
           videos.value = []
@@ -170,20 +199,31 @@ const handleOnlySubmission = () => {
       message.error(`投稿成功！但移除该本地存储发生错误：${error}`)
     }
   })
+
+  //上传视频封面
+  api.videoApi.UploadCover(videos.value[activeVideoIndex.value].uuid,videos.value[activeVideoIndex.value].cover).then(res=>{
+    if (!res.isSuccess){
+      message.error('上传封面失败')
+    }
+  })
 }
 const handleAllSubmission = () => {
   console.log(videos.value)
 }
-//删除审核队列item
-const handleDeleteManuscriptVideo = (video)=> manuscriptVideos.value = manuscriptVideos.value.filter(x=>x.id !== video.id)
-onMounted(() => {
-  localFileList.value = localStorageHelper.getItem('video_upload_record')
+
+const initManuscriptVideos =()=>{
   //初始化审核列表
   api.videoApi.GetByCombinationQuery(-1,1,5).then(res=>{
     if (res.isSuccess){
       manuscriptVideos.value = res.data
     }
   })
+}
+//删除审核队列item
+const handleDeleteManuscriptVideo = (video)=> manuscriptVideos.value = manuscriptVideos.value.filter(x=>x.id !== video.id)
+onMounted(() => {
+  localFileList.value = getLocalVideoArray()
+  initManuscriptVideos()
 })
 </script>
 
@@ -217,12 +257,13 @@ onMounted(() => {
               @handle-select-area-change="handleSelectArea"
               @handle-only-submission="handleOnlySubmission"
               @handle-all-submission="handleAllSubmission"
+              @handle-cancel="handleCancel"
           />
         </div>
 
         <ph-card v-else>
           <div class="no-file-container">
-            <img class="update_icon" src="../../../assets/HarmonyOS_Icons/ic_public_upload.svg">
+            <img class="update_icon" src="@assets/HarmonyOS_Icons/ic_public_upload.svg" alt="">
             <span>拖拽此处也可以上传</span>
             <div class="btn_upload" @click="handleUploadClick">上传视频</div>
           </div>
@@ -232,7 +273,7 @@ onMounted(() => {
 
     <video-manuscript-management
         :manuscript-videos="manuscriptVideos"
-        @handle-delete-manuscript-video="handleDeleteManuscriptVideo"/>
+        @handle-delete-manuscript-video="handleDeleteManuscriptVideo" @handleAdoptOK="initManuscriptVideos"/>
   </ph-view-layout>
 
 

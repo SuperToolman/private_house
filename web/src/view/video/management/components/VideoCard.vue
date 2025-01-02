@@ -6,9 +6,9 @@ const props = defineProps({
 })
 const emits = defineEmits(['handleDeleteVideoDone'])
 const resourceUrl = inject('resourceUrl')
+const resourceByUserAvatarUrl = inject('resourceByUserAvatarUrl')
 
 const Delete=(keyValue)=>{
-  console.log('删除视频：',keyValue)
   api.videoApi.DeleteById(keyValue).then(res=>{
     if (res.isSuccess){
       message.success(res.message)
@@ -18,6 +18,9 @@ const Delete=(keyValue)=>{
     }
   })
 }
+
+onMounted(()=>{
+})
 </script>
 
 <template>
@@ -30,7 +33,7 @@ const Delete=(keyValue)=>{
             <a-menu>
               <a-menu-item>
                 <div class="menu-item-wrap">
-                  <router-link :to="'/video/'+videoEntity.id">
+                  <router-link :to="'/video/' + (videoEntity.videoType === 0 ? 'Std' : 'Diff') + videoEntity.id">
                     <PlayCircleOutlined style="margin-right: 5px;color:#4a9cfa" type="primary"/>
                     <span>播放</span>
                   </router-link>
@@ -62,19 +65,22 @@ const Delete=(keyValue)=>{
 </div>
     <div class="video-info">
       <div class="title">
-        <router-link :to="'/video/'+videoEntity.id">
-          <span class="title-content" v-if="videoEntity.title">{{videoEntity.title}}</span>
+<!--        <div>啊？{{videoEntity.videoType}}</div>-->
+        <router-link :to="'/video/' + (videoEntity.videoType === 0 ? 'Std' : 'Diff') + videoEntity.id">
+        <span class="title-content" v-if="videoEntity.title">{{videoEntity.title}}</span>
           <span class="title-content" v-else>（暂无标题）</span>
         </router-link>
       </div>
       <div class="info">
         <div class="user-cover-wrap">
-          <a-image src="/src/assets/logo.png"/>
+          <a-image v-if="videoEntity.userItem" :src="resourceByUserAvatarUrl + videoEntity.userItem.uuid + '.webp'"/>
+          <a-avatar v-else>未选择用户</a-avatar>
         </div>
         <div class="user-info-wrap">
-          <p class="name">测试用户</p>
-          <p v-if="videoEntity.releaseTime" class="release-time">{{videoEntity.releaseTime}}</p>
-          <p v-else class="release-time">{{videoEntity.addTime}}</p>
+          <div v-if="videoEntity.userItem" class="name">{{ videoEntity.userItem.name }}</div>
+          <div v-else class="name">未选择用户</div>
+          <div v-if="videoEntity.releaseTime" class="release-time">{{videoEntity.releaseTime}}</div>
+          <div v-else class="release-time">{{videoEntity.addTime}}</div>
         </div>
       </div>
     </div>
@@ -164,6 +170,10 @@ const Delete=(keyValue)=>{
         //display: flex;
         font-size: 13px;
         color: #9a99a0;
+        height: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
         .name{
           font-weight: 600;
         }

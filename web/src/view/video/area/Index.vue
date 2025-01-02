@@ -1,11 +1,12 @@
 <script setup>
-import CollapsePanel from "@view/video/area/components/collapse-panel.vue";
-import Form from './components/form.vue'
+import CollapsePanel from "@view/video/area/components/CollapsePanel.vue";
+import Form from './components/Form.vue'
+import {message} from "ant-design-vue";
 
 const api = inject('api')
 const formOpenStatus = ref(false)
 const formTitle = ref('')
-const formColumnKey = ref('')
+const formEntity = ref(null)
 const collapseData = ref([])
 const activeKey = ref([]);
 
@@ -21,16 +22,20 @@ const handleOpen = (openStatus,reload)=>{
 const Add = ()=>{
   formOpenStatus.value = true
   formTitle.value = '添加分区'
-  formColumnKey.value = ''
+  formEntity.value = {id:'', name: "", desc:'',}
 }
-const Edite = (id)=>{
+const Edite = (entity)=>{
   formOpenStatus.value = true
   formTitle.value = '编辑分区'
-  formColumnKey.value = id
+  formEntity.value = entity
 }
 const Delete = (id)=>{
-  api.videoAreaApi.DeleteById(id);
-  dataInit()
+  api.videoAreaApi.DeleteById(id).then(res=>{
+    if (res.isSuccess){
+      message.success(res.message)
+      dataInit()
+    }
+  });
 }
 
 const dataInit = async () =>{
@@ -52,7 +57,7 @@ onBeforeMount(()=>{
       <!--内容-->
       <div class="content">
         <div class="left">
-          <collapse-panel @handelEdit="Edite" @handelDelete="Delete" :chides="collapseData"/>
+          <CollapsePanel @handelEdit="Edite" @handelDelete="Delete" :chides="collapseData"/>
         </div>
         <div class="right">
           <a-card>
@@ -70,7 +75,7 @@ onBeforeMount(()=>{
   <a-modal v-model:open="formOpenStatus" width="500px" :title="formTitle">
     <template #footer>
     </template>
-    <Form @handleOpen="handleOpen" :treeData="collapseData" :keyValue="formColumnKey"/>
+    <Form @handleOpen="handleOpen" :treeData="collapseData" :entity="formEntity"/>
   </a-modal>
 </template>
 

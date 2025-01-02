@@ -3,7 +3,7 @@ import PhCard from "@components/ph_inputs/PhCard.vue";
 import {inject, onMounted, ref} from "vue";
 import {message} from "ant-design-vue";
 
-const emits = defineEmits(['handleDeleteManuscriptVideo'])
+const emits = defineEmits(['handleDeleteManuscriptVideo','handleAdoptOK'])
 const props = defineProps({
   manuscriptVideos:{type:Array,default:[]}
 })
@@ -11,6 +11,8 @@ const api = inject('api')
 const videoModelDisplay = ref(false)
 const activeVideoIndex = ref(0)
 const resourceUrl = inject('resourceUrl')
+const resourceAuditPool = inject('resourceAuditPool')
+const resourceByUserAvatarUrl = inject('resourceByUserAvatarUrl')
 const handlePlay = (index)=>{
   activeVideoIndex.value = index;
   videoModelDisplay.value = true;
@@ -19,6 +21,7 @@ const handleAdopt = (video)=>{
   api.videoApi.AdoptForReview(video.id).then(res=>{
     if (res.isSuccess){
       message.success(res.message)
+      emits('handleAdoptOK')
     }
   })
 }
@@ -44,22 +47,17 @@ const handleDeleteTask = (video)=>{
         <div class="left">
           <div class="item-cover">
             <a-image v-if="video.coverUrl!==undefined" :src="resourceUrl+video.coverUrl"/>
-            <a-image v-else :src="resourceUrl+`Temp/${video.id}/cover.webp`"/>
+            <a-image v-else :src="`${resourceAuditPool}${video.uuid}/cover.webp`"/>
           </div>
           <div class="item-infos">
             <div class="video-title" @click="handlePlay(index)">{{video.title}}</div>
             <div class="up-name">
-              <a-avatar>测试up主</a-avatar>
-              测试up主
+              <a-avatar :src="resourceByUserAvatarUrl + video.userItem.uuid + '.webp'">测试up主</a-avatar>
+              {{ video.userItem.name }}
             </div>
             <div class="video-count-data">
-              <div class="count-data-item">120</div>
-              <div class="count-data-item">120</div>
-              <div class="count-data-item">120</div>
-              <div class="count-data-item">120</div>
-              <div class="count-data-item">120</div>
-              <div class="count-data-item">120</div>
-              <div class="count-data-item">120</div>
+              <div class="count-data-item">2024-12-12</div>
+              <div class="count-data-item">生活 -> xx</div>
             </div>
           </div>
         </div>

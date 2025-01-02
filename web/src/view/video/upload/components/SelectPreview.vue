@@ -3,7 +3,7 @@ import VideoHelper from "@common/js/videoHelper";
 import FileHelper from "@common/js/fileHelper";
 import {message} from "ant-design-vue";
 
-const emits = defineEmits(['handleUploadCover'])
+const emits = defineEmits(['handleUploadCover','handleChoseCover'])
 const props = defineProps({
   cover:{type:Object,default:null},
   previews:{type:Array}
@@ -13,6 +13,11 @@ const coverEntity = ref({
   dataURL:null,
   blob:null,
 })
+const choseIndex = ref(0);
+const handleChoseCover = (index) =>{
+  choseIndex.value = index
+  emits('handleChoseCover',{cover:props.previews[index],index})
+}
 const handleUploadCover = ()=>document.querySelector('#coverFileInput').click();
 const handleFileChange = async () => {
   const coverFile = event.target.files[0];
@@ -40,18 +45,23 @@ watch(props,()=>{
       }">
       </div>
       <div v-else class="cover-upload no-cover" @click="handleUploadCover">
-        <img class="update_icon" src="../../../../assets/HarmonyOS_Icons/ic_public_upload.svg" style="margin-bottom: 10px;">
+        <img class="update_icon" src="@assets/HarmonyOS_Icons/ic_public_upload.svg" style="margin-bottom: 10px;" alt="">
         <span>上传封面</span>
       </div>
     </div>
     <div class="cover-preview">
       <div class="cover-preview-list" v-if="previews.length > 0">
-        <div class="cover-preview-list-item" v-for="item in previews" :key="item" :style="{
+        <div @click="handleChoseCover(index)" :class="{
+          'cover-preview-list-item':true,
+        }" v-for="(item,index) in previews" :key="item" :style="{
           'background-image': `url(${item.dataURL})`,
           'background-size': 'cover',  // 将图片完整显示在容器中
           'background-position': 'center',  // 居中显示图片
           'background-repeat': 'no-repeat'  // 防止图片重复
         }">
+          <div class="chose-mask" v-if="index === choseIndex">
+            <CheckOutlined style="color: #00AEEC"/>
+          </div>
         </div>
       </div>
     </div>
@@ -89,6 +99,7 @@ watch(props,()=>{
     padding: 6px 0 0 0;
     display: flex;
     .cover-preview-list-item{
+      overflow: hidden;
       width: 120px;
       height: 90px;
       position: relative;
@@ -101,6 +112,16 @@ watch(props,()=>{
       justify-content: center;
       transition: all .5s ease-in-out;
       margin: 0 10px 0 0;
+
+      .chose-mask{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, .5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
   }
 }

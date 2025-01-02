@@ -2,17 +2,21 @@
 const api = inject('api')
 const props = defineProps({
   tagList:{type:Array},
+  tagRecommendTagList:{type:Array,default:[]}
 })
 const emits = defineEmits(['handleChangeTagList'])
-const recommendTagList = ref([])
+const autoValue = ref('')// 自动完成组件
+const autoOptions = ref([]);
 const handleKeyDownEnter = (event)=>{
   if (event.key === 'Enter') {
     if (props.tagList.length < 10){
-      const inputTag = document.querySelector(".input-val").value
-      if (props.tagList.indexOf(inputTag) === -1 && inputTag !== '')
-        props.tagList.push(inputTag)
+      if (props.tagList.indexOf(autoValue.value) === -1 && autoValue.value !== ''){
+        props.tagList.push(autoValue.value)
+        console.log('添加了输入标签',autoValue.value,props.tagList)
+      }
     }
-    document.querySelector(".input-val").value = '';
+    autoValue.value = '';
+    autoOptions.value = [];
   }
 }
 const handleDeleteTag = (tag)=>{
@@ -32,16 +36,39 @@ const isTagActive = (tag)=>{
   }
   return false
 }
+const onSearch = async (searchText) => {
+  // console.log(searchText); // 输出用户输入的内容
+  // 如果输入为空，直接清空建议
+  if (!searchText) {
+    autoOptions.value = [];
+    return;
+  }
 
+  try {
+    const res = await api.systemTagApi.SearchByName(searchText);
+    // 将接口返回的数据转换为组件要求的格式
+    autoOptions.value = (res.data || [searchText]).map(item => ({ value: item.name }));
+    if (!autoOptions.value.some(item=>item.value === searchText)){
+      autoOptions.value.unshift({value:searchText})
+    }
+  } catch (error) {
+    console.error('Error fetching suggestions:', error);
+    autoOptions.value = [];
+  }
+};
+const onSelect = value => {
+  // 将选中的建议加入 tagList
+  if (props.tagList.indexOf(value) === -1) {
+    props.tagList.push(value);
+  }
+};
+//应该根据视频来分析标签的，这次就随便弄吧
 watch(props.tagList,()=>{
+  // console.log('handleChangeTagList',props.tagList)
   emits('handleChangeTagList',props.tagList)
 })
 
 onMounted(()=>{
-  console.log(props.tagList)
-  api.videoTagApi.Get().then(res=>{
-    recommendTagList.value = res.data
-  })
 })
 </script>
 
@@ -58,14 +85,27 @@ onMounted(()=>{
           </div>
         </div>
         <div class="input-instance">
-          <input data-v-4f2d07f8="" type="text" maxlength="20" placeholder="按回车键Enter创建标签" class="input-val" @keydown="handleKeyDownEnter">
+<!--          <input  class="input-val" >-->
+          <a-auto-complete
+              :bordered="false"
+              class="input-val"
+              @keydown="handleKeyDownEnter"
+              data-v-4f2d07f8=""
+              type="text" maxlength="20"
+              placeholder="按回车键Enter创建标签"
+              v-model:value="autoValue"
+              :options="autoOptions"
+              style="width: 200px"
+              @select="onSelect"
+              @search="onSearch"
+          />
         </div>
         <p v-if="tagList" class="tag-last-wrp"> 还可以添加{{10 - tagList.length}}个标签 </p>
       </div>
 
     </div>
     <div class="tag-recommend">
-      <div :class="{'label-item-v1-container':true,'active':isTagActive(tag.name)}" v-for="tag in recommendTagList" :key="tag" @click="handleChoseRecommend(tag.name)">
+      <div :class="{'label-item-v1-container':true,'active':isTagActive(tag.name)}" v-for="tag in tagRecommendTagList" :key="tag" @click="handleChoseRecommend(tag.name)">
         <div class="label-item-v2-content">{{ tag.name }}</div>
       </div>
     </div>

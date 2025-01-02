@@ -8,7 +8,7 @@ const props = defineProps({
 <template>
   <ph-card>
     <div class="no-file-container">
-      <img class="update_icon" src="../../../assets/HarmonyOS_Icons/ic_public_upload.svg">
+      <img class="update_icon" src="@assets/HarmonyOS_Icons/ic_public_upload.svg" alt=""/>
       <span>拖拽此处也可以上传</span>
       <div class="btn_upload" @click="emits('handleUploadClick')">{{ buttonText }}</div>
     </div>

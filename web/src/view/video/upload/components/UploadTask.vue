@@ -48,14 +48,14 @@ const handleActivateIndexChange = (index)=>{
         </div>
         <div class="task-content-btn-wrap">
           <div @click="handleUpload" class="task-content-btn">
-            <img class="update_icon" src="../../../../assets/HarmonyOS_Icons/ic_public_add.svg" style="width: 20px;">
+            <img class="update_icon" src="@assets/HarmonyOS_Icons/ic_public_add.svg" style="width: 20px;" alt="">
             <span>添加视频</span>
           </div>
         </div>
       </div>
     </div>
     <div class="task-progress">
-      <img class="task-progress-icon" src="/src/assets/HarmonyOS_Icons/ic_normal_white_grid_video.svg">
+      <img class="task-progress-icon" src="@assets/HarmonyOS_Icons/ic_normal_white_grid_video.svg" alt="">
       <div class="task-progress-content">
         <div class="task-progress-info">
           <div class="task-progress-title">{{ videos[activeVideoIndex].fileName }}</div>

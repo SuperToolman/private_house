@@ -71,3 +71,28 @@ export const arrayToString = (array, separator = ',') =>{
     }
     return array.join(separator);
 }
+
+/**
+ * 提取字符串中的数字
+ * @param str
+ * @returns {*|null}
+ */
+export const extractNumber = (str) => {
+    // 使用正则表达式匹配数字
+    const match = str.match(/\d+/);
+    return match ? match[0] : null; // 如果找到了数字，返回数字，否则返回 null
+}
+
+/**
+ * 将比特转换为文件大小字符串
+ * @param bytes
+ * @returns {string}
+ */
+export const formatFileSize =(bytes)=> {
+    if (bytes === 0) return '0 B';
+
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+
+    return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
+}

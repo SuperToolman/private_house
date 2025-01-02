@@ -25,9 +25,10 @@ const props = defineProps({
   //padding: 5px 10px;
   border-radius: 8px;
   //margin-right: 12px;
-  margin: 6px;
+  //margin: 6px;
+  margin: 0 0 10px 0;
   box-shadow: 1px 2px 3px 1px rgba(116, 116, 116, 0.15);
-  overflow: hidden;
+  //overflow: hidden;
 
   .card-content-title{
     //padding-left: 24px;

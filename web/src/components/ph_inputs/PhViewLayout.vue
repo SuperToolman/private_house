@@ -2,7 +2,7 @@
 const router = useRouter()
 const props = defineProps({
   title:{type:String,default:'Title'},
-  subTitle:{type:String,default:'sub-title'},
+  subTitle:{type:String,default:''},
 
   isAdd:{type:Boolean},
   isEntity:{type:Boolean},
@@ -18,23 +18,32 @@ const handleBack = ()=>{
 
 <template>
   <!--头部-->
-  <ph-page-header :title="title" :sub-title="subTitle">
-    <slot name="view-tool"></slot>
-  </ph-page-header>
+  <div class="view-layout-wrap">
+    <ph-page-header :title="title" :sub-title="subTitle">
+      <slot name="view-tool"></slot>
+    </ph-page-header>
 
-  <div class="view-body">
-    <slot class="view-body-content">
-
-    </slot>
+    <div class="view-body">
+      <slot class="view-body-content">
+      </slot>
+    </div>
   </div>
 
 </template>
 
 <style scoped>
-.view-body{
-  min-height: 1vh;
-  .view-body-content{
+.view-layout-wrap{
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .view-body{
+    flex: 1;
     min-height: 1vh;
+    .view-body-content{
+      min-height: 1vh;
+    }
   }
 }
+
 </style>

@@ -7,7 +7,7 @@
 <template>
  <PhCard>
    <div class="task-progress">
-     <img class="task-progress-icon" src="../../assets/HarmonyOS_Icons/ic_normal_white_grid_video.svg" alt="">
+     <img class="task-progress-icon" src="@assets/HarmonyOS_Icons/ic_normal_white_grid_video.svg" alt="">
      <div class="task-progress-content">
        <div class="task-progress-info">
          <div class="task-progress-title">{{ entity.fileName }}</div>

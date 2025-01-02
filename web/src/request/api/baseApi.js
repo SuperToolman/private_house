@@ -13,6 +13,9 @@ export class BaseApi {
     }
     Add = (entity) => {
         console.log(`${this.controllerName}执行了通用新增操作：`,entity)
+        if (entity.hasOwnProperty('id')){
+            delete entity.id
+        }
         return myAxios({
             method: 'post',
             url: `/${this.controllerName}`,
@@ -50,6 +53,13 @@ export class BaseApi {
         return myAxios({
             method: 'get',
             url: `/${this.controllerName}/Paged`
+        })
+    }
+
+    GetRandomByCount = (count) => {
+        return myAxios({
+            method: 'get',
+            url: `/${this.controllerName}/RandomByCount?count=${count}`
         })
     }
 }

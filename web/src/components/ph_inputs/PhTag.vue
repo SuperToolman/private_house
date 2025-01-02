@@ -13,7 +13,6 @@ const emits = defineEmits(["handleTagEdit","handleTagDelete"])
     <a-popconfirm ok-text="删除" cancel-text="算了" title="删除无法还原！确定删除？" @confirm="emits('handleTagDelete',tagEntity)">
       <DeleteOutlined class="btn_delete"/>
     </a-popconfirm>
-    <!--        <img src="https://xxx">-->
     <div class="item__background">{{tagEntity.name}}</div>
     <span class="item__name">{{tagEntity.name}}</span>
   </div>
