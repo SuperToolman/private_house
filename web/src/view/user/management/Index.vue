@@ -4,7 +4,7 @@
     <template #view-tool>
       <a-space>
         <a-button type="primary" @click="openDrawer('添加', true,null)">添加</a-button>
-        <EasyUserModal/>
+        <PhSimpleAddUser @handle-add-result="handleAddSimpleResult"/>
       </a-space>
     </template>
 
@@ -67,7 +67,6 @@ import PhViewLayout from "@components/ph_inputs/PhViewLayout.vue";
 import { message } from "ant-design-vue";
 import UserModal from "@view/user/management/components/UserModal.vue";
 import dayjs from "dayjs";
-import EasyUserModal from "./components/EasyUserModal.vue"; // 直接引用组件
 
 // 注入 API 和资源 URL
 const api = inject('api');
@@ -100,6 +99,9 @@ const dataInit = () => {
     }
   });
 };
+const handleAddSimpleResult = (newUser)=>{
+  tableData.value.push(newUser)
+}
 //计算生日剩余日期
 const daysUntilNextBirthday = (birthdayStr)=> {
   // 当前日期的开始时间（去掉时间部分，只保留日期）

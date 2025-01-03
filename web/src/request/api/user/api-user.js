@@ -1,6 +1,5 @@
 import myAxios from '../../axios.jsx';
 import {BaseApi} from "@request/api/baseApi";
-import { v1 as uuidv1 } from 'uuid';
 
 export default class extends BaseApi{
     constructor() {
@@ -20,11 +19,17 @@ export default class extends BaseApi{
         })
     }
 
-
     SearchUserByName = (userName)=>{
         return myAxios({
             method:'get',
             url:`/User/SearchUserByName?userName=${userName}`
+        })
+    }
+
+    AddBySimple = (userName) =>{
+        return myAxios({
+            method:'post',
+            url:`/User/Simple?userName=${userName}`
         })
     }
 }

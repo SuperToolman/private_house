@@ -1,7 +1,6 @@
 <script setup>
 import CollapsePanel from "@view/video/area/components/CollapsePanel.vue";
 import Form from './components/Form.vue'
-import {message} from "ant-design-vue";
 
 const api = inject('api')
 const formOpenStatus = ref(false)
@@ -32,7 +31,6 @@ const Edite = (entity)=>{
 const Delete = (id)=>{
   api.videoAreaApi.DeleteById(id).then(res=>{
     if (res.isSuccess){
-      message.success(res.message)
       dataInit()
     }
   });
@@ -53,19 +51,16 @@ onBeforeMount(()=>{
     <template #view-tool>
       <a-button type="primary" @click="Add">添加</a-button>
     </template>
-    <PhCard>
-      <!--内容-->
-      <div class="content">
-        <div class="left">
-          <CollapsePanel @handelEdit="Edite" @handelDelete="Delete" :chides="collapseData"/>
-        </div>
-        <div class="right">
-          <a-card>
-            测试
-          </a-card>
-        </div>
-      </div>
-    </PhCard>
+    <!--内容-->
+    <PhSpace :flex-count="1" class="content">
+      <PhCard class="left">
+        <CollapsePanel @handelEdit="Edite" @handelDelete="Delete" :chides="collapseData"/>
+      </PhCard>
+
+      <PhCard class="right">
+        测试
+      </PhCard>
+    </PhSpace>
   </PhViewLayout>
 
 
@@ -84,7 +79,6 @@ onBeforeMount(()=>{
   flex-grow: 1;
 }
 .content .right{
-  margin-left: 20px;
   min-width: 620px;
 }
 </style>

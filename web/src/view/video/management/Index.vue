@@ -2,7 +2,7 @@
   <ph-view-layout :title="'视频管理'" :sub-title="'管理和查看以上架的全部视频信息'">
     <template #view-tool>
       <div class="videos-controller">
-        <ph-select-video-area-by-parent-input @handle-update-video-area="areaId => videoAreaId = areaId"/>
+        <ph-select-video-area-by-parent-input @handle-update-video-area="(areaId) => {videoAreaId = areaId;console.log(areaId)}"/>
         <a-select v-model:value="auditStatus" style="width: 150px;margin:0 8px">
           <a-select-option value="-1">全部状态</a-select-option>
           <a-select-option value="0">草稿</a-select-option>
@@ -70,15 +70,7 @@ onMounted(() => {
   width: 100%;
   grid-gap: 20px;
 }
-
-
-.form-tools{
-  display: flex;
-}
 .form-tools button{
   margin-right: 7px;
-}
-.form-tools .a-button{
-  margin-right: 5px;
 }
 </style>

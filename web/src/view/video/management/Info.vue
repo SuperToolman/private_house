@@ -1,7 +1,6 @@
 <script setup>
 import Info_AuthorData from "@view/video/management/components/Info_AuthorData.vue";
-import {message} from "ant-design-vue";
-import {extractNumber} from "../../../common/js/utils";
+import {extractNumber} from "@common/js/utils";
 
 const lastPlaybackTime = ref(0); // 用于记录上次播放时间
 const videoElement = ref(null); // 用于引用 <video> 元素
@@ -47,16 +46,13 @@ const handleSubmitByPushTag = ()=>{
     if (res.isSuccess){
       const newTagList = tagString.split(',')
       videoTagList.value.push(...newTagList)
-      message.success(res.message)
-    }else message.error(res.message)
+    }
   })
 }
 const handleRemoveTag = (tag) =>{
   videoTagList.value = videoTagList.value.filter(x=>x !== tag)
   videoEntity.value.tagString = videoTagList.value.join(',')
-  api.videoApi.Update(videoEntity.value).then(res=>{
-    res.isSuccess?message.success(res.message):message.error(res.message)
-  })
+  api.videoApi.Update(videoEntity.value)
 }
 
 const handleChoseDifference = (newVideoSrc) => {

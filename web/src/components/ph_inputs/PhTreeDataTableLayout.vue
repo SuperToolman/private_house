@@ -2,14 +2,8 @@
 const props = defineProps({
   tableColumns:{type:Array,default:[]},
   tableData:{type:Array,default:[]},
-  formComponent:{type:Object},
-  formOpenStatus:{type:Boolean,default:false},
-  formModalWidth:{type:Number,default:700},
-  formTitle:{type:String,default:'title'}
 })
-const emits = defineEmits(['handleTableColumnDeleteEvent','handleFormSubmit'])
-const formEntity = ref(null)
-const formModalOpenStatus = ref(false)
+const emits = defineEmits(['handleTableColumnDeleteEvent','handleTableColumnEditEvent'])
 const rowSelection = ref({
   checkStrictly: false,
   onChange: (selectedRowKeys, selectedRows) => {
@@ -22,16 +16,9 @@ const rowSelection = ref({
     console.log(selected, selectedRows, changeRows);
   },
 });
-const onFinish = (form)=>{
-  emits('handleFormSubmit',form)
-  formModalOpenStatus.value = false
-}
 </script>
 
 <template>
-  <PhCard>
-    <a-button @click="formEntity = null;formModalOpenStatus = true" type="primary">添加</a-button>
-  </PhCard>
   <PhCard>
     <a-table
         :columns="tableColumns"
@@ -46,7 +33,7 @@ const onFinish = (form)=>{
           <!--编辑-->
           <a-tooltip>
             <template #title>编辑</template>
-            <EditOutlined style="margin-right: 5px;color:#797878" type="primary" @click="formEntity=record;formModalOpenStatus = true"/>
+            <EditOutlined style="margin-right: 5px;color:#797878" type="primary" @click="emits('handleTableColumnEditEvent',record)"/>
           </a-tooltip>
 
           <!--删除-->
@@ -67,13 +54,6 @@ const onFinish = (form)=>{
       </template>
     </a-table>
   </PhCard>
-  <component
-      :is="formComponent.component"
-      :menu-entity="formEntity"
-      :formOpenStatus="formModalOpenStatus"
-      @on-finish="onFinish"
-      @on-cancel="formModalOpenStatus = false"
-  />
 </template>
 
 <style scoped>

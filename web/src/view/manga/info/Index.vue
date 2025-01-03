@@ -1,9 +1,8 @@
 <script setup>
-import {message} from "ant-design-vue";
 import InfoChapter from "./components/InfoChapter.vue";
 import InfoRecommend from "./components/InfoRecommend.vue";
 import InfoComment from "./components/InfoComment.vue";
-import {formatFileSize} from "../../../common/js/utils";
+import {formatFileSize} from "@common/js/utils";
 
 const route = useRoute()
 const router = useRouter()
@@ -19,8 +18,6 @@ const dataInit = ()=>{
       console.log('获取漫画信息：',res.data)
       mangaEntity.value = res.data
     }
-    else
-      message.error(res.message)
   })
 }
 const handleRead = ()=>{

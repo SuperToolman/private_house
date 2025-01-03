@@ -1,6 +1,4 @@
 <script setup>
-import {message} from "ant-design-vue";
-
 const api = inject('api')
 const auditStatus = ref("-1")
 const countOption = ref("0")
@@ -11,8 +9,7 @@ const dataInit = ()=>{
     if (res.isSuccess){
       console.log("获取漫画数据",res.data)
       mangaList.value = res.data;
-    }else
-      message.error(res.message)
+    }
   })
 }
 onMounted(()=>{

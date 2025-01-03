@@ -1,7 +1,5 @@
 <script setup>
-import VideoHelper from "@common/js/videoHelper";
 import FileHelper from "@common/js/fileHelper";
-import {message} from "ant-design-vue";
 
 const emits = defineEmits(['handleUploadCover','handleChoseCover'])
 const props = defineProps({
@@ -24,7 +22,7 @@ const handleFileChange = async () => {
   FileHelper.GetBlobAndBase64StringForObject(coverFile).then(res=>{
     coverEntity.value = res
     emits('handleUploadCover',coverEntity.value)
-  }).catch(error=>message.error(error))
+  })
 }
 
 watch(props,()=>{

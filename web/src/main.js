@@ -29,6 +29,6 @@ app.use(VueLazyload, {
 
 app.provide('api',api)
 app.provide('resourceUrl','http://localhost:9080/')
-app.provide('resourceByUserAvatarUrl','http://localhost:9080/UserAvatar/')
+app.provide('resourceByUserAvatarUrl','http://localhost:9080/UserAvatars/')
 app.provide('resourceAuditPool','http://localhost:9080/AuditPool/')
 app.mount('#app')

@@ -1,7 +1,5 @@
 <script setup>
 import PhCard from "@components/ph_inputs/PhCard.vue";
-import {inject, onMounted, ref} from "vue";
-import {message} from "ant-design-vue";
 
 const emits = defineEmits(['handleDeleteManuscriptVideo','handleAdoptOK'])
 const props = defineProps({
@@ -20,7 +18,6 @@ const handlePlay = (index)=>{
 const handleAdopt = (video)=>{
   api.videoApi.AdoptForReview(video.id).then(res=>{
     if (res.isSuccess){
-      message.success(res.message)
       emits('handleAdoptOK')
     }
   })
@@ -30,9 +27,7 @@ const handleDeleteTask = (video)=>{
   api.videoApi.DeleteById(video.id).then(res=>{
     if (res.isSuccess){
       emits('handleDeleteManuscriptVideo',video)
-      message.success(res.message)
     }
-    else message.error(res.message)
   })
 }
 

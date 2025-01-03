@@ -15,7 +15,7 @@ const linkList = ref([
   {name:'漫画资源',link:'/AppResources/Manga'},
   {name:'视频资源',link:'/AppResources/Video'},
   {name:'电影资源',link:'/AppResources/Movie'},
-  {name:'用户头像',link:'/UserAvatar'},
+  {name:'用户头像',link:'/UserAvatars'},
   {name:'标签封面',link:'/TagCovers'},
   {name:'审核池',link:'/AuditPool'},
 ])

@@ -25,9 +25,10 @@ const Delete = (id)=>{
       <div class="content">
         <a-descriptions>
           <a-descriptions-item label="区名">{{item.name}}</a-descriptions-item>
+          <a-descriptions-item label="ID">{{ item.id }}</a-descriptions-item>
           <a-descriptions-item label="添加时间">{{ item.addTime }}</a-descriptions-item>
           <a-descriptions-item label="更新时间">{{ item.updateTime }}</a-descriptions-item>
-          <a-descriptions-item label="备注">{{ item.desc }}</a-descriptions-item>
+          <a-descriptions-item label="描述">{{ item.desc }}</a-descriptions-item>
         </a-descriptions>
         <span class="actions">
             <!--编辑-->

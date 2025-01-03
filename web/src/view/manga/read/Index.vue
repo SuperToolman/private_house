@@ -1,6 +1,4 @@
 <script setup>
-import {message} from "ant-design-vue";
-
 const api = inject('api');
 const resourceUrl = inject('resourceUrl');
 const route = useRoute();
@@ -13,11 +11,8 @@ const dataInit = async (mangaId) => {
     const res = await api.mangaApi.GetById(mangaId);
     if (res.isSuccess) {
       mangaEntity.value = res.data;
-    } else {
-      message.error(res.message);
     }
   } catch (error) {
-    message.error("加载漫画数据失败！");
     console.error(error);
   }
 };

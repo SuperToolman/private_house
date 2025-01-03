@@ -8,8 +8,11 @@
     <a-modal
         v-model:open="openStatus"
         :title="'请选择用户'">
-      <!--搜索-->
-      <a-input-search v-model:value="searchText" placeholder="搜索用户" enter-button @search="dataInit"/>
+      <!--搜索用户-->
+      <PhSpace :flex-count="1">
+        <a-input-search v-model:value="searchText" placeholder="搜索用户" enter-button @search="dataInit"/>
+        <PhSimpleAddUser @handle-add-result="(newUser)=>{tableData.push(newUser)}"/>
+      </PhSpace>
 
       <!--表格-->
       <a-table
@@ -41,7 +44,6 @@
   </div>
 </template>
 <script setup>
-import {inject, onMounted, ref} from 'vue';
 import {
   ManOutlined,
   RobotOutlined,

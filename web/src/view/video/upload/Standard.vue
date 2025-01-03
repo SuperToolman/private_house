@@ -3,13 +3,13 @@ import VideoHelper from "@common/js/videoHelper";
 import VideoManuscriptManagement from "./components/VideoManuscriptManagement.vue";
 import UploadTask from "./components/UploadTask.vue";
 import UploadTaskForm from "./components/UploadTaskForm.vue";
-import {message} from "ant-design-vue";
 import {
   addItemToLocalVideoArray,
   getLocalVideoArray,
   removeItemByIdFromVideoArray,
   removeVideoArray
-} from "../../../common/js/storageUtils";
+} from "@common/js/storageUtils";
+import {message} from "ant-design-vue";
 
 const api = inject('api');
 const videos = ref([]);
@@ -170,7 +170,6 @@ const handleCancel = ()=>{
       if (backIndex === -1) {
         //移除的视频为唯一任务
         videos.value = []
-        message.success(res.message)
       }
     }
   })
@@ -192,7 +191,6 @@ const handleOnlySubmission = () => {
         if (backIndex === -1) {
           //移除的视频为唯一任务
           videos.value = []
-          message.success(res.message)
         }
       }
     } catch (error) {

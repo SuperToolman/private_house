@@ -1,7 +1,7 @@
 <script setup>
 const router = useRouter()
 const props = defineProps({
-  title:{type:String,default:'Title'},
+  title:{type:String,default:''},
   subTitle:{type:String,default:''},
 
   isAdd:{type:Boolean},

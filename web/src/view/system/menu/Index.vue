@@ -1,8 +1,10 @@
 <script setup>
-import Form from "./components/FormModal.vue";
-import {message} from "ant-design-vue";
+import Form from "./components/Form.vue";
 
 const api = inject('api');
+const modalTrigger = ref(null)
+const formState = ref({})
+const phModalOpen = ref(false)
 const tableColumns = [
   {title: 'ID', dataIndex: 'id', key: 'id'},
   // {title: '上级ID', dataIndex: 'parentID', key: 'parentID'},
@@ -32,49 +34,54 @@ const dataInit = ()=>{
     // console.log('初始化数据',tableData.value)
   });
 }
-const handleFormSubmit = (entity)=>{
-  console.log('测试提交',entity)
-  // && entity.id.length >0
-  // 判断entity是否存在id属性
-  if ('id' in entity){
-    api.systemMenuApi.Update(entity).then(res=>{
-      if(res.isSuccess) {
-        dataInit()
-        message.success(res.message);
-      }else
-        message.error(res.message)
-    })
-  }else {
-    api.systemMenuApi.Add(entity).then(res=>{
-      res.isSuccess?message.success(res.message):message.error(res.message)
-    })
-  }
-}
+
 const handleColumnDeleteEvent = (id)=>{
   api.systemMenuApi.DeleteById(id).then(res=>{
-    if(res.isSuccess){
+    if(res.isSuccess)
       dataInit()
-      message.success(res.message)
-    }else
-      message.error(res.message)
   })
 }
+const handleColumnEditEvent = (menuEntity)=>{
+  //需要将Entity传递进入Form中的Entity
+  formState.value = menuEntity
+  phModalOpen.value = true
+}
+const handleTriggerEvent = ()=>{
+
+}
+
 onMounted(() => {
   dataInit()
 });
-
 </script>
 
 <template>
   <PhViewLayout title="菜单管理" sub-title="管理系统的菜单、路由配置">
+    <template #view-tool>
+      <PhModal
+          v-model:open="phModalOpen"
+          title="添加菜单"
+          :hide-buttons="true"
+      >
+        <template #trigger>
+          <a-button type="primary" ref="modalTrigger">添加菜单</a-button>
+        </template>
+
+        <template #content>
+          <Form :form-state="formState" @handle-cancel-modal="phModalOpen = false"/>
+        </template>
+      </PhModal>
+
+    </template>
+
     <PhTreeDataTableLayout
         :table-columns="tableColumns"
         :table-data="tableData"
         @handle-table-column-delete-event="handleColumnDeleteEvent"
-        @handleFormSubmit="handleFormSubmit"
-        :formComponent="{ component: Form }"
-    >
-    </PhTreeDataTableLayout>
+        @handle-table-column-edit-event ="handleColumnEditEvent"
+    />
+
+    <!--表单-->
   </PhViewLayout>
 
 </template>

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {notification} from "ant-design-vue";
+import {message, notification} from "ant-design-vue";
 import {flattenAndJoin} from "@common/js/utils";
 
 
@@ -33,8 +33,11 @@ instance.interceptors.response.use(response => {
     // 如果返回的状态码为200，说明接口请求成功，可以正常拿到数据，否则的话抛出错误
     if (response.status === 200) {
         if (response.data.isSuccess){
-            // 发送成功通知
-            // notification['success']({message: 'Success', description: `${response.data.message}`,});
+            if (response.data.notice){
+                // 发送成功通知
+                message.success(response.data.message)
+                // notification['success']({message: 'Success', description: `${response.data.message}`,});
+            }
         }else{
             notification['error']({message: 'Error', description: `${response.data.message}`,});
         }

@@ -2,7 +2,6 @@
 import VideoHelper from "@common/js/videoHelper";
 import DifferenceList from "@view/video/upload/components/DifferenceList.vue";
 import SelectPreview from "@view/video/upload/components/SelectPreview.vue";
-import {message} from "ant-design-vue";
 
 const api = inject('api')
 const videoPreviewTimeList = ref([])
@@ -189,13 +188,9 @@ const handleIndexDown = (index)=>{
 
 const handleSubmission = ()=>{
   //提交数据
-  api.videoApi.SubmissionByDifference(videoDifferenceForm.value,videos.value).then(res=>{
-    if (res.isSuccess) message.success(res.message)
-  })
+  api.videoApi.SubmissionByDifference(videoDifferenceForm.value,videos.value)
   //上传头像
-  api.videoApi.UploadCover(videos.value[0].uuid,videoDifferenceForm.value.cover).then(res=>{
-    if (!res.isSuccess) message.error(res.message)
-  })
+  api.videoApi.UploadCover(videos.value[0].uuid,videoDifferenceForm.value.cover)
 }
 </script>
 

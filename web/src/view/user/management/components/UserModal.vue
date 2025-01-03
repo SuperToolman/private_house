@@ -2,7 +2,6 @@
 import dayjs from 'dayjs';
 import AvatarUploader2 from "@view/user/management/components/AvatarUploader2.vue";
 import {api} from "@request/mangement";
-import {message} from "ant-design-vue";
 import PhSpace from "@components/ph_inputs/PhSpace.vue";
 import {v4 as uuidv4} from "uuid";
 
@@ -38,14 +37,13 @@ const handleSubmit = async () => {
     console.log(formState.value)
     apiMethod(formState.value).then(res => {
       if (res.isSuccess) {
-        message.success(formState.value.id ? "更新成功" : "添加成功");
         handleClose()
       }
     });
 
     //提交头像文件
     api.userApi.UploadAvatar(avatarFile.value,formState.value.uuid).then(res=>{
-      if(!res.isSuccess) message.error(res.message)
+
     })
   } else {
     console.error('子组件未正确挂载');
@@ -57,7 +55,7 @@ const handleClose = ()=>{
 
 // 监听 props.user 变化并初始化 formState
 watch(() => props.user, (newUser) => {
-  formState.value = newUser? {...newUser}:{uuid: uuidv4(), name: "", eMail: "", phone: "", password: "", birthday: new Date().toLocaleDateString('en-CA'), coin: 0, level: 1, nowExp: 0, nextExp: 0, sign: "", sex: "", identityCard: "", avatarImageUrl: '',haveAvatar:false}
+  formState.value = newUser? {...newUser}:{uuid: uuidv4(), name: "", eMail: "", phone: "", password: "", birthday: new Date().toLocaleDateString('en-CA'), coin: 0, level: 1, nowExp: 0, nextExp: 200, sign: "", sex: "", identityCard: "", avatarImageUrl: '',haveAvatar:false}
 }, {immediate: true});//这是 watch 选项的一部分，表示在初始化时（即 watch 被设置后立即）也会执行一次回调函数。这样，formState.value 会在组件挂载时立即根据 newUser 的值进行一次初始化设置。
 
 </script>

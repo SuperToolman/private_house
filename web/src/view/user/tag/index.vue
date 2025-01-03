@@ -11,7 +11,6 @@
 </template>
 
 <script setup>
-import {message} from "ant-design-vue";
 import PhTag from "../../../components/ph_inputs/PhTag.vue";
 
 const api = inject('api');
