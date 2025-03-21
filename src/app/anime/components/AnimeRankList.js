@@ -80,7 +80,13 @@ export default function AnimeRankList() {
                             className={`relative h-full mr-[15px] last:mr-0 transition-all duration-300 ease-in-out ${hoveredIndex === index ? 'flex-grow-[2.5]' : 'flex-grow-[1]'}`}
                             style={{ flexBasis: '0%' }}
                         >
-                            <img src={item.image} alt={item.title} className="w-full h-full object-cover rounded-lg" />
+                            <Image 
+                                src={item.image} 
+                                alt={item.title} 
+                                fill
+                                className="object-cover rounded-lg"
+                                sizes="(max-width: 768px) 100vw, 33vw"
+                            />
                             <div className="absolute bottom-0 left-0 right-0 bg-white/80 p-2 rounded-b-lg">
                                 <div className="flex justify-between items-center">
                                     <div className="text-lg font-bold text-black">{index + 1}</div>

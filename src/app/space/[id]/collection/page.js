@@ -261,8 +261,8 @@ export default function CollectionPage() {
             {viewMode === 'list' ? (
                 // 列表视图
                 collectionData.map(collection => (
-                    <div className='bg-white rounded-lg p-4 shadow-lg mb-4 last:mb-0'>
-                        <CollectionList key={collection.id} collection={collection} />
+                    <div key={collection.id} className='bg-white rounded-lg p-4 shadow-lg mb-4 last:mb-0'>
+                        <CollectionList collection={collection} />
                     </div>
                 ))
             ) : (

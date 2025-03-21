@@ -1,3 +1,5 @@
+import Image from "next/image"
+
 export default function VideoComment({commentItems}){
     return (
         <div className="space-y-2.5">
@@ -5,9 +7,11 @@ export default function VideoComment({commentItems}){
                 <div className="flex mb-2.5" key={item.id}>
                     {/* 发言者头像 */}
                     <div className="w-12 h-12 rounded-full overflow-hidden mr-[15px]">
-                        <img 
+                        <Image 
                             src={item.userItem.avatarUrl} 
-                            alt="" 
+                            alt="User avatar" 
+                            width={48}
+                            height={48}
                             className="w-full h-full object-cover"
                         />
                     </div>

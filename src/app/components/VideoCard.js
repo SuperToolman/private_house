@@ -1,6 +1,7 @@
 'use client';
 
 import Link from "next/link"
+import Image from "next/image"
 
 export default function VideoCard({
     title = "默认标题",
@@ -16,10 +17,14 @@ export default function VideoCard({
         <div className="flex flex-col w-full h-full">
             <Link href={`/video/${user.id}`}>
                 <div className="w-full h-full rounded-lg overflow-hidden mb-2.5">
-                    <img 
+                    <Image 
                         src={coverUrl} 
                         alt={title} 
+                        width={0}
+                        height={0}
+                        sizes="100vw"
                         className="w-full h-full object-cover"
+                        style={{ width: '100%', height: 'auto' }}
                     />
                 </div>
             </Link>

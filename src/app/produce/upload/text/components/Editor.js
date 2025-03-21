@@ -17,8 +17,10 @@ export default function Editor({ value, onChange }) {
     };
 
     const execCommand = (command, value = null) => {
-        document.execCommand(command, false, value);
-        handleInput();
+        if (typeof document !== 'undefined') {
+            document.execCommand(command, false, value);
+            handleInput();
+        }
     };
 
     if (!isMounted) {

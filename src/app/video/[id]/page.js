@@ -203,11 +203,11 @@ export default function VideoInfo({ params }) {
                             <div className="w-[48px] h-[48px] rounded-full overflow-hidden mr-2.5">
                                 <Image 
                                     src={testVideoObject.user.avatarUrl} 
-                                    alt="用户头像" 
+                                    alt="User avatar" 
                                     width={48}
                                     height={48}
                                     className="w-full h-full object-cover" 
-                                /> 
+                                />
                             </div>
                             <input 
                                 type="text" 
@@ -232,7 +232,13 @@ export default function VideoInfo({ params }) {
                     {/* 作者信息 */}
                     <div className="flex items-center">
                         <div className="w-12 h-12 rounded-full overflow-hidden mr-2">
-                            <img src={testVideoObject.user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                            <Image 
+                                src={testVideoObject.user.avatarUrl} 
+                                alt="User avatar" 
+                                width={48}
+                                height={48}
+                                className="w-full h-full object-cover" 
+                            />
                         </div>
                         <div className="flex-1">
                             <div className="text-base font-semibold mb-1.5 text-[#18191c]">

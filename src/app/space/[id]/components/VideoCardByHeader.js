@@ -6,15 +6,16 @@ import React from 'react';
 
 // 创建一个纯展示的封面图组件
 const VideoCover = React.memo(({ coverUrl, isPlaying }) => (
-  <Image 
-    src={coverUrl} 
-    alt="video-cover" 
-    width={500} 
-    height={500}
-    className={`transition-opacity duration-300 ${isPlaying ? 'opacity-0' : 'opacity-100'}`}
-    loading="lazy"
-  />
-));
+    <Image 
+      src={coverUrl} 
+      alt="video-cover" 
+      width={500} 
+      height={500}
+      className={`transition-opacity duration-300 ${isPlaying ? 'opacity-0' : 'opacity-100'}`}
+      loading="lazy"
+    />
+  ));
+  VideoCover.displayName = "VideoCover"; // 添加 displayName
 
 export default function VideoCardByHeader({ videoEntity }) {
     const cardRef = useRef(null);
