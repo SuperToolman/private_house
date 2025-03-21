@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 在线链接服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
+@font-face {
+  font-family: 'iconfont';  /* Project id 4410328 */
+  src: url('//at.alicdn.com/t/c/font_4410328_peu64p5ip2o.woff2?t=1742279696527') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4410328_peu64p5ip2o.woff?t=1742279696527') format('woff'),
+       url('//at.alicdn.com/t/c/font_4410328_peu64p5ip2o.ttf?t=1742279696527') format('truetype');
+}
+
+/* 添加 iconfont 基础样式 */
+.iconfont {
+  font-family: "iconfont" !important;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+/* 移除所有可能影响字体大小的样式 */
+/* .iconfont[class*="icon-"] {
+  font-size: inherit !important;
+} */
+
+/* 添加自定义组件类 */
+@layer components {
+  .icon-large {
+    font-size: 46px !important;
+  }
+}
+
+/* 确保图标可以继承父元素的大小 */
+/* .iconfont[class^="icon-"] {
+  font-size: inherit;
+} */
+
+:root {
+  /* 基础字体设置 */
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+  /* 品牌色系 */
+  --brand_pink: var(--Pi5);
+  --brand_blue: var(--Lb5);
+  --stress_red: var(--Re5);
+  --success_green: var(--Gr5);
+  --operate_orange: var(--Or5);
+  --pay_yellow: var(--Ye5);
+
+  /* 背景色系 */
+  --bg1: var(--Wh0);
+  --bg2: var(--Ga0);
+  --bg3: var(--Ga1);
+
+  /* 文本色系 */
+  --text1: var(--Ga10);
+  --text2: var(--Ga7);
+  --text3: var(--Ga5);
+  --text4: var(--Ga3);
+  --text_link: var(--Lb7);
+
+  /* 线条色系 */
+  --line_light: var(--Ga1_s);
+  --line_regular: var(--Ga2);
+  --line_bold: var(--Ga3);
+}
+
+/* 重置样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  list-style: none;
+  text-decoration: none;
+}
+
+/* 基础样式 */
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--bg1);
+  color: var(--text1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 链接样式 */
+a {
+  color: inherit;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line_regular);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text2);
+}
+
+/* 通用工具类 */
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 暗色模式 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg1: var(--Ga10);
+    --bg2: var(--Ga9);
+    --bg3: var(--Ga8);
+    --text1: var(--Wh0);
+    --text2: var(--Ga3);
+    --text3: var(--Ga2);
+    --text4: var(--Ga1);
+    --line_light: var(--Ga8);
+    --line_regular: var(--Ga7);
+    --line_bold: var(--Ga6);
+  }
+}
