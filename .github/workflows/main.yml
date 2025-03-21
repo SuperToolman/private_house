@@ -1,4 +1,4 @@
-name: Actions CI - Next.js 15 Build & Deploy
+name: Actions CI - Next.js Build & Deploy
 
 on:
   push:
@@ -7,6 +7,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
     - name: 获取源码  
       uses: actions/checkout@v3
@@ -15,13 +16,11 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: 18
-        cache: 'pnpm'
 
-    - name: 安装 Pnpm  
+    - name: 安装 pnpm  
       run: |
-        corepack enable
-        corepack prepare pnpm@8.15.5 --activate
-        pnpm --version
+        npm install -g pnpm
+        pnpm --version  # 确保安装成功
 
     - name: 安装依赖  
       run: pnpm install
@@ -29,11 +28,11 @@ jobs:
     - name: 构建 Next.js 15  
       run: |
         pnpm run build
-        mkdir -p .next/static && touch .next/static/.nojekyll  # 确保静态资源目录存在
+        mkdir -p out && touch out/.nojekyll  # 确保 out 目录存在
 
     - name: 部署到 GitHub Pages  
       uses: JamesIves/github-pages-deploy-action@v4
       with:
         branch: gh-pages
-        folder: .next/static
+        folder: out
         clean: true
