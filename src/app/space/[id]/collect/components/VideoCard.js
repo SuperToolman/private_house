@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-const VideoCard = ({ video }) => {
+const VideoCard = ({ video, isMobile }) => {
     return (
         <div className="video-card">
             <Link href={`/video/${video.id}`} className="block group">
@@ -25,7 +25,7 @@ const VideoCard = ({ video }) => {
 
                 {/* 视频信息 */}
                 <div className="mt-3">
-                    <div className="text-[14px] text-[#18191c] line-clamp-2 group-hover:text-[#00aeec]">
+                    <div className={`${isMobile ? 'text-[13px]' : 'text-[14px]'} text-[#18191c] line-clamp-2 group-hover:text-[#00aeec]`}>
                         {video.title}
                     </div>
                     <div className="mt-2 flex items-center text-[12px] text-[#9499a0]">

@@ -1,8 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useResponsive } from '../../contexts/ResponsiveContext';
 
 export default function RecommandHeader() {
+    const { isMobile, isTablet } = useResponsive();
     const [layout, setLayout] = useState([]);
     
     // 模拟推荐漫画数据 - 数量可能不固定
@@ -33,13 +35,13 @@ export default function RecommandHeader() {
     // 生成一个随机布局
     useEffect(() => {
         generateRandomLayout();
-    }, []);
+    }, [isMobile]); // 移动端状态变化时重新生成布局
 
     // 计算单元格大小 - 以适应398px高度
-    const GRID_HEIGHT = 398; // 固定容器高度
-    const ROW_HEIGHT = 90; // 单行高度 (略微减小以增加行数)
+    const GRID_HEIGHT = isMobile ? 280 : 398; // 移动端降低高度
+    const ROW_HEIGHT = isMobile ? 70 : 90; // 移动端降低行高
     const MAX_ROWS = Math.floor(GRID_HEIGHT / ROW_HEIGHT); // 最大行数
-    const GAP_SIZE = 6; // 间隙大小减小，使布局更紧凑
+    const GAP_SIZE = 6;
 
     // 生成随机布局的函数
     const generateRandomLayout = () => {
@@ -66,15 +68,15 @@ export default function RecommandHeader() {
         }
         
         // 限制最大数量
-        largeItemCount = Math.min(5, largeItemCount);
+        largeItemCount = Math.min(isMobile ? 3 : 5, largeItemCount);
         
         // 多样化卡片大小，以提高填充效率
         const cardSizes = [
-            { cols: 3, rows: 2, weight: 2 },  // 横向大卡
+            { cols: isMobile ? 2 : 3, rows: 2, weight: 2 },  // 横向大卡
             { cols: 2, rows: 2, weight: 3 },  // 方形卡片
-            { cols: 2, rows: 3, weight: 1 },  // 纵向大卡
-            { cols: 4, rows: 2, weight: 1 },  // 超宽卡片 (适合少数据)
-            { cols: 6, rows: 2, weight: itemCount <= 8 ? 1 : 0 }, // 半屏宽卡片 (仅在极少数据时使用)
+            { cols: 2, rows: isMobile ? 2 : 3, weight: isMobile ? 0 : 1 },  // 纵向大卡，移动端不使用
+            { cols: isMobile ? 3 : 4, rows: 2, weight: 1 },  // 超宽卡片
+            { cols: isMobile ? 4 : 6, rows: 2, weight: itemCount <= 8 ? 1 : 0 }, // 半屏宽卡片 (仅在极少数据时使用)
         ];
         
         // 根据权重创建尺寸池
@@ -291,17 +293,19 @@ export default function RecommandHeader() {
         setLayout(newLayout);
     };
 
+    // 可见项目数量限制
+    const visibleCount = isMobile ? 8 : layout.length;
+
     return (
         <div className="w-full mb-8">
-            {/* 使用CSS Grid布局实现随机排列 - 高度固定为398px */}
+            {/* 使用CSS Grid布局实现随机排列 - 高度固定 */}
             <div 
                 className="grid grid-cols-12 gap-1" 
                 style={{ 
-                    // height: '398px',
                     gridTemplateRows: `repeat(${MAX_ROWS}, ${ROW_HEIGHT}px)`,
                 }}
             >
-                {layout.map((item, index) => (
+                {layout.slice(0, visibleCount).map((item, index) => (
                     <div 
                         key={`${item.manga.id}-${index}`}
                         style={{
@@ -316,6 +320,7 @@ export default function RecommandHeader() {
                             manga={item.manga} 
                             isHot={item.isHot} 
                             isLarge={item.colSpan > 1 || item.rowSpan > 1}
+                            isMobile={isMobile}
                         />
                     </div>
                 ))}
@@ -333,50 +338,41 @@ export default function RecommandHeader() {
 }
 
 // 抽取成单独的组件，方便复用
-function MangaItem({ manga, isLarge = false, isHot = false }) {
+function MangaItem({ manga, isLarge = false, isHot = false, isMobile = false }) {
     return (
         <div 
             className="relative w-full h-full rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
         >
             <Link href={`/manga/${manga.id}`}>
-                <div className="w-full h-full relative group">
-                    {/* 占位图片 */}
-                    <div className="absolute inset-0 bg-gray-200 animate-pulse">
-                        {/* 图片加载前的占位 */}
-                    </div>
-                    
-                    {/* 图片 */}
+                {/* 漫画封面图 */}
+                <div className="relative w-full h-full">
                     <Image
-                        src={manga.image || '/images/manga-placeholder.jpg'}
+                        src={manga.image}
                         alt={manga.title}
                         fill
                         className="object-cover"
-                        sizes={isLarge ? '33vw' : '16vw'}
+                        sizes="(max-width: 768px) 50vw, 25vw"
                     />
                     
                     {/* 渐变遮罩 */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
-                    
-                    {/* 漫画信息 */}
-                    <div className="absolute bottom-0 left-0 p-3 w-full text-white">
-                        <h3 className={`font-medium ${isLarge ? 'text-xl' : 'text-sm'} line-clamp-1`}>
-                            {manga.title}
-                        </h3>
-                        {isLarge && (
-                            <div className="mt-1 text-sm text-gray-300">
-                                <span>{manga.author}</span>
-                                <span className="mx-2">·</span>
-                                <span>{manga.tag}</span>
-                            </div>
-                        )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+                </div>
+                
+                {/* 热门标记 */}
+                {isHot && (
+                    <div className="absolute top-1 right-1 bg-red-500 text-white px-2 py-0.5 rounded-full text-xs">
+                        热门
                     </div>
-                    
-                    {/* 热门标签 */}
-                    {isHot && (
-                        <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                            热门
-                        </div>
-                    )}
+                )}
+                
+                {/* 漫画信息 */}
+                <div className="absolute bottom-0 left-0 w-full p-2">
+                    <h3 className={`text-white font-medium ${isMobile ? 'text-xs' : isLarge ? 'text-base' : 'text-sm'} mb-1 line-clamp-1`}>
+                        {manga.title}
+                    </h3>
+                    <p className={`text-white/80 ${isMobile ? 'text-[10px]' : 'text-xs'} line-clamp-1`}>
+                        {manga.author} · {manga.tag}
+                    </p>
                 </div>
             </Link>
         </div>

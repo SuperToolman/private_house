@@ -7,8 +7,10 @@ import 'swiper/css/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import AnimeRankList from './components/AnimeRankList'
+import { useResponsive } from '../contexts/ResponsiveContext'
 
 export default function Anime() {
+    const { isMobile, isTablet, isClient } = useResponsive();
     const [currentBg, setCurrentBg] = useState('/images/testcover.webp')
     const [activeSlide, setActiveSlide] = useState(0)
     const isAnimating = useRef(false)
@@ -140,10 +142,17 @@ export default function Anime() {
         return () => clearInterval(timer);
     }, [activeSlide, slides.length]);
 
+    // 服务端渲染占位
+    if (!isClient) {
+        return <div className="w-full h-screen flex items-center justify-center bg-[#f5f5f5]">
+            <div className="text-lg text-gray-500">加载中...</div>
+        </div>;
+    }
+
     return (
         <div className="min-h-screen bg-white">
             {/* 背景区域 */}
-            <div className="relative h-[70vh] overflow-hidden">
+            <div className={`relative ${isMobile ? 'h-[40vh]' : 'h-[70vh]'} overflow-hidden`}>
                 {/* 背景图 */}
                 <div
                     className="absolute inset-0 transition-all duration-500"
@@ -159,31 +168,32 @@ export default function Anime() {
             </div>
 
             {/* 内容区域 */}
-            <div className="relative z-10 -mt-32">
+            <div className={`relative z-10 ${isMobile ? '-mt-16' : '-mt-32'}`}>
                 {/* 主要内容区 */}
                 <div className="max-w-[1600px] mx-auto px-4">
                     {/* 轮播区域 */}
                     <div className="relative mb-8">
                         {/* 当前视频信息 */}
-                        <div className="absolute -top-16 right-0 z-20 flex items-center">
-                            <span className="text-black text-base mr-2">
+                        <div className={`absolute ${isMobile ? '-top-12 left-2' : '-top-16 right-0'} z-20 flex items-center`}>
+                            <span className={`text-black ${isMobile ? 'text-sm mr-1' : 'text-base mr-2'}`}>
                                 {slides[activeSlide].title}
                             </span>
-                            <button className="flex items-center justify-center bg-[#4e6ef2] text-white px-4 py-2 rounded-full">
-                                <i className="fas fa-play mr-2"></i>
-                                <span className="text-sm">立即观看</span>
+                            <button className={`flex items-center justify-center bg-[#4e6ef2] text-white ${isMobile ? 'px-2 py-1 text-xs' : 'px-4 py-2 text-sm'} rounded-full`}>
+                                <i className="fas fa-play mr-1"></i>
+                                <span>立即观看</span>
                             </button>
                         </div>
 
                         {/* 轮播图容器 */}
-                        <div className="grid grid-cols-7 gap-1 space-x-2">
+                        <div className={`grid ${isMobile ? 'grid-cols-4 gap-1 space-x-1' : 'grid-cols-7 gap-1 space-x-2'}`}>
                             {slides.map((slide, index) => (
-                                <div key={slide.id} className="relative">
+                                <div key={slide.id} className={`relative ${isMobile && index >= 4 ? 'hidden' : ''}`}>
                                     <Link href={slide.link} className="block">
                                         <div
-                                            className={`h-[120px] rounded-lg overflow-hidden relative transition-all duration-500 origin-center ${index === activeSlide ? 'scale-110 z-10' : 'scale-100'
+                                            className={`${isMobile ? 'h-[80px]' : 'h-[120px]'} rounded-lg overflow-hidden relative transition-all duration-500 origin-center ${index === activeSlide ? 'scale-110 z-10' : 'scale-100'
                                                 }`}
                                             onMouseEnter={() => handleSlideChange(index)}
+                                            onClick={() => isMobile && handleSlideChange(index)}
                                         >
                                             <div className="absolute inset-0 border border-white/30"></div>
                                             <div className="relative w-full h-full">
@@ -199,7 +209,7 @@ export default function Anime() {
                                             <div className={`absolute inset-0 bg-black/50 transition-opacity duration-500 ${index === activeSlide ? 'opacity-0' : 'opacity-100'
                                                 }`} />
                                             <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent">
-                                                <div className="text-white text-sm truncate">
+                                                <div className={`text-white ${isMobile ? 'text-xs' : 'text-sm'} truncate`}>
                                                     {slide.title}
                                                 </div>
                                             </div>
@@ -211,19 +221,19 @@ export default function Anime() {
                     </div>
 
                     {/* 分类导航区域 */}
-                    <div className="border border-black/10 rounded-lg p-4 mb-8">
-                        <div className="grid grid-cols-4 gap-8">
+                    <div className={`border border-black/10 rounded-lg ${isMobile ? 'p-2' : 'p-4'} mb-8`}>
+                        <div className={`${isMobile ? 'space-y-4' : 'grid grid-cols-4 gap-8'}`}>
                             {categories.map(category => (
-                                <div key={category.id} className="space-y-3">
-                                    <div className="text-black/90 text-sm font-medium">
+                                <div key={category.id} className="space-y-2">
+                                    <div className={`text-black/90 ${isMobile ? 'text-xs' : 'text-sm'} font-medium`}>
                                         {category.name}
                                     </div>
-                                    <div className="flex flex-wrap gap-4">
+                                    <div className="flex flex-wrap gap-3">
                                         {category.subItems.map(item => (
                                             <Link
                                                 key={item}
                                                 href="#"
-                                                className="text-black/60 hover:text-black text-sm transition-colors"
+                                                className={`text-black/60 hover:text-black ${isMobile ? 'text-xs' : 'text-sm'} transition-colors`}
                                             >
                                                 {item}
                                             </Link>
@@ -234,16 +244,16 @@ export default function Anime() {
                         </div>
 
                         {/* 热搜区域 */}
-                        <div className="mt-4 pt-4 border-t border-black/10">
-                            <div className="text-black/90 text-sm font-medium mb-2">
+                        <div className={`${isMobile ? 'mt-3 pt-3' : 'mt-4 pt-4'} border-t border-black/10`}>
+                            <div className={`text-black/90 ${isMobile ? 'text-xs' : 'text-sm'} font-medium mb-2`}>
                                 热搜
                             </div>
-                            <div className="flex gap-6">
+                            <div className={`flex ${isMobile ? 'gap-3 flex-wrap' : 'gap-6'}`}>
                                 {hotSearch.map((item, index) => (
                                     <Link
                                         key={index}
                                         href="#"
-                                        className="text-black/60 hover:text-black text-sm transition-colors"
+                                        className={`text-black/60 hover:text-black ${isMobile ? 'text-xs' : 'text-sm'} transition-colors`}
                                     >
                                         {item}
                                     </Link>
@@ -256,15 +266,15 @@ export default function Anime() {
                     <div className="mb-8">
                         <div className="flex items-center gap-2 mb-4">
                             <i className="fas fa-heart text-pink-500"></i>
-                            <span className="text-black font-medium">正在追</span>
+                            <span className={`text-black font-medium ${isMobile ? 'text-sm' : ''}`}>正在追</span>
                             <div className="flex-grow"></div>
                             <Link href="/my/following" className="text-black/60 hover:text-black">
-                                <i className="fas fa-heart"></i> 我的追番
+                                <i className="fas fa-heart"></i> <span className={`${isMobile ? 'text-xs' : ''}`}>我的追番</span>
                             </Link>
                         </div>
-                        <div className="grid grid-cols-6 gap-4">
+                        <div className={`grid ${isMobile ? 'grid-cols-3' : isTablet ? 'grid-cols-4' : 'grid-cols-6'} gap-3`}>
                             {watching.map((anime, index) => (
-                                <div key={index} className="group cursor-pointer">
+                                <div key={index} className={`group cursor-pointer ${isMobile && index >= 6 ? 'hidden' : ''}`}>
                                     <div className="relative aspect-[16/9] mb-2">
                                         <div className="relative w-full h-full">
                                             <Image
@@ -276,7 +286,7 @@ export default function Anime() {
                                             />
                                         </div>
                                         {anime.badge && (
-                                            <div className="absolute top-0 left-0 bg-[#4e6ef2] text-white text-xs px-2 py-0.5 rounded-br">
+                                            <div className={`absolute top-0 left-0 bg-[#4e6ef2] text-white ${isMobile ? 'text-[10px] px-1' : 'text-xs px-2'} py-0.5 rounded-br`}>
                                                 {anime.badge}
                                             </div>
                                         )}
@@ -289,10 +299,10 @@ export default function Anime() {
                                             </div>
                                         )}
                                     </div>
-                                    <div className="text-black/80 text-sm group-hover:text-black transition-colors line-clamp-2">
+                                    <div className={`text-black/80 ${isMobile ? 'text-xs' : 'text-sm'} group-hover:text-black transition-colors line-clamp-2`}>
                                         {anime.title}
                                     </div>
-                                    <div className="text-black/60 text-xs mt-1">
+                                    <div className={`text-black/60 ${isMobile ? 'text-[10px]' : 'text-xs'} mt-1`}>
                                         {anime.episode}
                                     </div>
                                 </div>
@@ -304,19 +314,39 @@ export default function Anime() {
                     <AnimeRankList />
                 </div>
 
-                {/* 右侧快捷入口 */}
-                <div className="fixed right-4 top-1/2 -translate-y-1/2 space-y-2">
-                    {quickLinks.map((link, index) => (
-                        <Link
-                            key={index}
-                            href={link.link}
-                            className="flex flex-col items-center justify-center w-10 h-10 bg-black/5 hover:bg-black/10 rounded text-black/80 hover:text-black transition-colors"
-                        >
-                            <span className="text-lg">{link.icon}</span>
-                            <span className="text-[10px]">{link.text}</span>
-                        </Link>
-                    ))}
-                </div>
+                {/* 右侧快捷入口 - 移动端隐藏 */}
+                {!isMobile && (
+                    <div className="fixed right-4 top-1/2 -translate-y-1/2 space-y-2">
+                        {quickLinks.map((link, index) => (
+                            <Link
+                                key={index}
+                                href={link.link}
+                                className="flex flex-col items-center justify-center w-10 h-10 bg-black/5 hover:bg-black/10 rounded text-black/80 hover:text-black transition-colors"
+                            >
+                                <span className="text-lg">{link.icon}</span>
+                                <span className="text-[10px]">{link.text}</span>
+                            </Link>
+                        ))}
+                    </div>
+                )}
+
+                {/* 移动端底部快捷导航 */}
+                {isMobile && (
+                    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4 z-50">
+                        <div className="flex justify-between">
+                            {quickLinks.map((link, index) => (
+                                <Link
+                                    key={index}
+                                    href={link.link}
+                                    className="flex flex-col items-center"
+                                >
+                                    <span className="text-lg">{link.icon}</span>
+                                    <span className="text-[10px]">{link.text}</span>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     )

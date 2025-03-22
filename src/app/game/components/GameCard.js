@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function GameCard({ game }) {
+export default function GameCard({ game, isMobile }) {
     // 默认游戏数据，当没有传入游戏数据时使用
     const defaultGame = {
         id: 1,
@@ -53,6 +53,99 @@ export default function GameCard({ game }) {
         return tagColors[tag] || 'text-gray-600';
     };
 
+    // 移动端布局
+    if (isMobile) {
+        return (
+            <div className="w-full rounded-lg overflow-hidden shadow-md bg-white my-3">
+                {/* 游戏信息头部 */}
+                <div className="p-3 flex items-center">
+                    {/* 游戏头像 */}
+                    <div className="relative w-10 h-10 mr-3 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
+                        <Image
+                            src={gameData.avatar}
+                            alt={`${gameData.title} avatar`}
+                            fill
+                            className="object-cover"
+                            sizes="40px"
+                        />
+                        {gameData.badge && (
+                            <div className="absolute top-0 left-0 bg-pink-500 text-white text-xs px-1 py-px">
+                                B
+                            </div>
+                        )}
+                    </div>
+                    
+                    {/* 游戏标题和评分 */}
+                    <div className="flex-1">
+                        <h3 className="font-medium text-base">{gameData.title}</h3>
+                        <div className="flex items-center flex-wrap text-sm mt-1">
+                            <span className="text-amber-500 mr-2 flex items-center">
+                                <span className="text-base">★</span>
+                                <span className="ml-0.5">{gameData.rating}</span>
+                            </span>
+                            
+                            {/* 只显示前两个标签 */}
+                            {gameData.tags && gameData.tags.slice(0, 2).map((tag, index) => (
+                                <span key={index} className={`${getTagTextColor(tag)} text-xs`}>
+                                    {tag}
+                                    {index < 1 ? <span className="mx-1 text-gray-400">·</span> : ''}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                    
+                    {/* 下载按钮 */}
+                    <button className="bg-pink-500 text-white px-3 py-1.5 rounded-md flex items-center justify-center text-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        下载
+                    </button>
+                </div>
+                
+                {/* 游戏封面 */}
+                <div className="w-full relative overflow-hidden h-[160px]">
+                    <Image 
+                        src={gameData.cover}
+                        alt={gameData.title}
+                        fill
+                        className="object-cover w-full h-full"
+                        sizes="100vw"
+                    />
+                </div>
+                
+                {/* 游戏描述 */}
+                {(gameData.desc || gameData.longDesc) && (
+                    <div className="p-3">
+                        <p className="text-sm text-gray-700 line-clamp-2">
+                            {gameData.desc || gameData.longDesc}
+                        </p>
+                    </div>
+                )}
+                
+                {/* 游戏截图预览 - 横向滚动 */}
+                {gameData.screenshots && gameData.screenshots.length > 0 && (
+                    <div className="px-3 pb-3">
+                        <div className="flex gap-2 overflow-x-auto pb-1">
+                            {gameData.screenshots.slice(0, 3).map((screenshot, index) => (
+                                <div key={index} className="w-[130px] h-[80px] relative flex-shrink-0 rounded overflow-hidden">
+                                    <Image
+                                        src={screenshot}
+                                        alt={`${gameData.title} screenshot ${index + 1}`}
+                                        fill
+                                        className="object-cover"
+                                        sizes="130px"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    // 桌面端布局
     return (
         <div className="w-full h-[285px] flex rounded-lg overflow-hidden">
             {/* 左侧游戏封面 - 改为更大的长方形 */}

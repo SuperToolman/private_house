@@ -1,14 +1,14 @@
 'use client';
 import Link from 'next/link';
 
-const RightSidebar = () => {
+const RightSidebar = ({ isMobile }) => {
     return (
-        <div className="right-sidebar w-[300px] space-y-4">
+        <div className={`right-sidebar ${isMobile ? 'w-full' : 'w-[300px]'} space-y-4`}>
             {/* 认证信息 */}
             <div className="bg-white rounded-lg p-4 shadow-lg">
-                <div className="flex justify-between items-center">
-                    <span className="text-[#18191c]">点此申请bilibili认证 {`>`}</span>
-                    <span className="text-[#9499a0] text-sm">获得认证，享受多重认证福利！</span>
+                <div className={`${isMobile ? 'flex-col' : 'flex justify-between'} items-center`}>
+                    <span className="text-[#18191c] block">点此申请bilibili认证 {`>`}</span>
+                    <span className={`text-[#9499a0] text-sm ${isMobile ? 'mt-2' : ''}`}>获得认证，享受多重认证福利！</span>
                 </div>
             </div>
 
@@ -21,7 +21,7 @@ const RightSidebar = () => {
                     </div>
                     <i className="iconfont icon-arrow-right text-[#9499a0]"></i>
                 </div>
-                <div className="flex justify-between">
+                <div className={`${isMobile ? 'grid grid-cols-2 gap-4' : 'flex justify-between'}`}>
                     <Link href="/upload" className="flex items-center text-[#61666d]">
                         <i className="iconfont icon-upload mr-1"></i>
                         <span>视频投稿</span>

@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 
-const DynamicItem = ({ item }) => {
+const DynamicItem = ({ item, isMobile }) => {
     const [liked, setLiked] = useState(false);
 
     const handleLike = () => {
@@ -24,8 +24,8 @@ const DynamicItem = ({ item }) => {
                     <Image
                         src={user.avatar || '/images/default-avatar.webp'}
                         alt={user.name}
-                        width={48}
-                        height={48}
+                        width={isMobile ? 40 : 48}
+                        height={isMobile ? 40 : 48}
                         className="rounded-full"
                     />
                 </Link>
@@ -35,7 +35,7 @@ const DynamicItem = ({ item }) => {
                             <Link href={`/space/${user.id}`} className="text-[#18191c] font-medium hover:text-[#00aeec]">
                                 {user.name}
                             </Link>
-                            <span className="text-[#9499a0] text-sm ml-2">{item.createTime || '未知时间'}</span>
+                            <span className={`text-[#9499a0] ${isMobile ? 'text-xs' : 'text-sm'} ml-2`}>{item.createTime || '未知时间'}</span>
                         </div>
                         <div className="text-[#9499a0] cursor-pointer hover:text-[#00aeec]">
                             <i className="iconfont icon-more text-xl"></i>
@@ -45,8 +45,8 @@ const DynamicItem = ({ item }) => {
                     {item.type === 'video' && content && (
                         <div className="mt-3">
                             <Link href={`/video/${content.videoId || item.id}`} className="block">
-                                <div className='w-full flex bg-[#f6f7f8] rounded-[10px] border border-[#e3e5e7]'>
-                                    <div className="relative w-[236px] h-[132px] rounded-lg overflow-hidden">
+                                <div className={`w-full ${isMobile ? 'flex flex-col' : 'flex'} bg-[#f6f7f8] rounded-[10px] border border-[#e3e5e7]`}>
+                                    <div className={`relative ${isMobile ? 'w-full h-[180px]' : 'w-[236px] h-[132px]'} rounded-lg overflow-hidden`}>
                                         <Image
                                             src={content.coverUrl || '/images/default-cover.webp'}
                                             alt={content.title || '视频'}
@@ -57,26 +57,26 @@ const DynamicItem = ({ item }) => {
                                             {content.duration || '00:00'}
                                         </div>
                                     </div>
-                                    <div className="ml-3 mt-3 text-[15px] text-[#18191c] hover:text-[#00aeec]">
+                                    <div className={`${isMobile ? 'p-3' : 'ml-3 mt-3'}`}>
                                         <div className='text-[15px] text-[#18191c] hover:text-[#00aeec]'>
                                             {content.title || '未知标题'}
                                         </div>
-                                        <div className='mt-[6px] text-[13px] text-[#9499a0]'>
+                                        <div className={`${isMobile ? 'mt-1 text-xs' : 'mt-[6px] text-[13px]'} text-[#9499a0]`}>
                                             {content.desc || ''}
                                         </div>
                                     </div>
                                 </div>
                             </Link>
-                            <div className="mt-3 flex items-center text-[14px] text-[#9499a0] pt-3">
+                            <div className={`mt-3 flex items-center ${isMobile ? 'text-xs' : 'text-[14px]'} text-[#9499a0] pt-3`}>
                                 <div className="flex items-center cursor-pointer hover:text-[#00aeec]">
                                     <i className="iconfont icon-info-zhuanfa mr-1"></i>
                                     <span>{content.shareCount || 0}</span>
                                 </div>
-                                <div className="flex items-center ml-8 cursor-pointer hover:text-[#00aeec]">
+                                <div className={`flex items-center ${isMobile ? 'ml-4' : 'ml-8'} cursor-pointer hover:text-[#00aeec]`}>
                                     <i className="iconfont icon-pinglun mr-1"></i>
                                     <span>{content.commentCount || 0}</span>
                                 </div>
-                                <div className="flex items-center ml-8 cursor-pointer hover:text-[#00aeec]" onClick={handleLike}>
+                                <div className={`flex items-center ${isMobile ? 'ml-4' : 'ml-8'} cursor-pointer hover:text-[#00aeec]`} onClick={handleLike}>
                                     <i className={`iconfont icon-info-dianzhan mr-1 ${liked ? 'text-[#00aeec]' : ''}`}></i>
                                     <span>{content.likeCount || 0}</span>
                                 </div>
@@ -90,12 +90,12 @@ const DynamicItem = ({ item }) => {
                                 {[...Array(content.rating || 0)].map((_, index) => (
                                     <i key={index} className="iconfont icon-star text-[#ffa726]"></i>
                                 ))}
-                                <span className="ml-2">无敌，，</span>
+                                <span className={`${isMobile ? 'ml-1 text-sm' : 'ml-2'}`}>无敌，，</span>
                             </div>
                             <div className="mt-3 bg-[#f6f7f8] p-3 rounded-lg">
                                 <div className="text-[#18191c] font-medium">{content.title || '未知内容'}</div>
                                 {content.gameInfo && (
-                                    <div className="mt-2 text-[14px] text-[#9499a0]">
+                                    <div className={`mt-2 ${isMobile ? 'text-xs' : 'text-[14px]'} text-[#9499a0]`}>
                                         <span>{content.gameInfo.score || '0.0'}</span>
                                         <span className="mx-2">·</span>
                                         <span>{content.gameInfo.players || '0人评价'}</span>
@@ -104,16 +104,16 @@ const DynamicItem = ({ item }) => {
                                     </div>
                                 )}
                             </div>
-                            <div className="mt-3 flex items-center text-[14px] text-[#9499a0] pt-3">
+                            <div className={`mt-3 flex items-center ${isMobile ? 'text-xs' : 'text-[14px]'} text-[#9499a0] pt-3`}>
                                 <div className="flex items-center cursor-pointer hover:text-[#00aeec]">
                                     <i className="iconfont icon-info-zhuanfa mr-1"></i>
                                     <span>{content.shareCount || 0}</span>
                                 </div>
-                                <div className="flex items-center ml-8 cursor-pointer hover:text-[#00aeec]">
+                                <div className={`flex items-center ${isMobile ? 'ml-4' : 'ml-8'} cursor-pointer hover:text-[#00aeec]`}>
                                     <i className="iconfont icon-pinglun mr-1"></i>
                                     <span>{content.commentCount || 0}</span>
                                 </div>
-                                <div className="flex items-center ml-8 cursor-pointer hover:text-[#00aeec]" onClick={handleLike}>
+                                <div className={`flex items-center ${isMobile ? 'ml-4' : 'ml-8'} cursor-pointer hover:text-[#00aeec]`} onClick={handleLike}>
                                     <i className={`iconfont icon-info-dianzhan mr-1 ${liked ? 'text-[#00aeec]' : ''}`}></i>
                                     <span>{content.likeCount || 0}</span>
                                 </div>
@@ -126,4 +126,4 @@ const DynamicItem = ({ item }) => {
     );
 };
 
-export default DynamicItem; 
+export default DynamicItem;

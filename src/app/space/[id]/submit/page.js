@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useResponsive } from '../../../contexts/ResponsiveContext';
 
 // 测试数据
 const testData = [
@@ -128,20 +129,41 @@ const testData = [
 ];
 
 // 左侧导航组件
-const LeftNav = () => {
+const LeftNav = ({ isMobile }) => {
     const navItems = [
         { text: '视频', count: 2661, active: true },
         { text: '图文', count: 242 },
         { text: '音频', count: 0 }
     ];
 
+    if (isMobile) {
+        return (
+            <div className="w-full mb-4 bg-white rounded-lg p-3 shadow-md">
+                <div className="flex items-center justify-between space-x-2">
+                    {navItems.map((item, index) => (
+                        <div
+                            key={index}
+                            className={`flex-1 flex items-center justify-center px-2 py-2 rounded-lg cursor-pointer text-center ${
+                                item.active ? 'bg-[#00aeec] text-white' : 'text-[#61666d] bg-[#f6f7f8]'
+                            }`}
+                        >
+                            <span className="text-sm">{item.text}</span>
+                            <span className="text-xs ml-1">({item.count})</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="w-[200px] shrink-0">
             {navItems.map((item, index) => (
                 <div
                     key={index}
-                    className={`flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer mb-2 ${item.active ? 'bg-[#00aeec] text-white' : 'text-[#61666d] hover:bg-[#f6f7f8]'
-                        }`}
+                    className={`flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer mb-2 ${
+                        item.active ? 'bg-[#00aeec] text-white' : 'text-[#61666d] hover:bg-[#f6f7f8]'
+                    }`}
                 >
                     <span>{item.text}</span>
                     <span>{item.count}</span>
@@ -152,7 +174,7 @@ const LeftNav = () => {
 };
 
 // 顶部筛选组件
-const FilterBar = ({ viewMode, onViewModeChange }) => {
+const FilterBar = ({ viewMode, onViewModeChange, isMobile }) => {
     const filters = [
         { text: '最新发布', active: true },
         { text: '最多播放', active: false },
@@ -160,13 +182,14 @@ const FilterBar = ({ viewMode, onViewModeChange }) => {
     ];
 
     return (
-        <div className="flex items-center justify-between border-b border-[#e3e5e7] pb-3">
-            <div className="flex items-center space-x-6">
+        <div className={`flex items-center justify-between border-b border-[#e3e5e7] pb-3 ${isMobile ? 'flex-wrap' : ''}`}>
+            <div className={`flex items-center ${isMobile ? 'space-x-3 mb-2' : 'space-x-6'}`}>
                 {filters.map((filter, index) => (
                     <div
                         key={index}
-                        className={`cursor-pointer text-[14px] ${filter.active ? 'text-[#00aeec] font-medium' : 'text-[#61666d] hover:text-[#00aeec]'
-                            }`}
+                        className={`cursor-pointer ${isMobile ? 'text-[12px]' : 'text-[14px]'} ${
+                            filter.active ? 'text-[#00aeec] font-medium' : 'text-[#61666d] hover:text-[#00aeec]'
+                        }`}
                     >
                         {filter.text}
                     </div>
@@ -176,7 +199,6 @@ const FilterBar = ({ viewMode, onViewModeChange }) => {
                 className="text-[14px] text-[#61666d] hover:text-[#00aeec] transition-all duration-300 ease-in-out cursor-pointer flex items-center"
                 onClick={() => onViewModeChange(viewMode === 'grid' ? 'list' : 'grid')}
             >
-                <i className={`iconfont icon-${viewMode === 'grid' ? 'list' : 'grid'} mr-1`}></i>
                 {
                     viewMode === 'grid' ? (
                         <i className='iconfont icon-view-list' style={{ fontSize: '24px' }}></i>
@@ -190,7 +212,7 @@ const FilterBar = ({ viewMode, onViewModeChange }) => {
 };
 
 // 视频卡片组件 - 网格视图
-const VideoGridCard = ({ video }) => {
+const VideoGridCard = ({ video, isMobile }) => {
     return (
         <div className="video-card">
             <Link href={`/video/${video.id}`} className="block group">
@@ -207,7 +229,7 @@ const VideoGridCard = ({ video }) => {
                     </div>
                 </div>
                 <div className="mt-3">
-                    <div className="text-[14px] text-[#18191c] line-clamp-2 group-hover:text-[#00aeec]">
+                    <div className={`${isMobile ? 'text-[13px]' : 'text-[14px]'} text-[#18191c] line-clamp-2 group-hover:text-[#00aeec]`}>
                         {video.title}
                     </div>
                     <div className="mt-2 flex items-center text-[12px] text-[#9499a0]">
@@ -228,11 +250,11 @@ const VideoGridCard = ({ video }) => {
 };
 
 // 视频卡片组件 - 列表视图
-const VideoListCard = ({ video }) => {
+const VideoListCard = ({ video, isMobile }) => {
     return (
-        <div className="video-card flex gap-4 py-4 border-b border-[#e3e5e7] last:border-none">
-            <Link href={`/video/${video.id}`} className="shrink-0 block group">
-                <div className="relative w-[256px] h-[144px] rounded-lg overflow-hidden">
+        <div className={`video-card flex gap-4 py-4 border-b border-[#e3e5e7] last:border-none ${isMobile ? 'flex-col' : ''}`}>
+            <Link href={`/video/${video.id}`} className={`${isMobile ? 'w-full' : 'shrink-0'} block group`}>
+                <div className={`relative ${isMobile ? 'w-full h-[180px]' : 'w-[256px] h-[144px]'} rounded-lg overflow-hidden`}>
                     <Image
                         src={video.coverUrl}
                         alt={video.title}
@@ -246,7 +268,7 @@ const VideoListCard = ({ video }) => {
             </Link>
             <div className="flex-1">
                 <Link href={`/video/${video.id}`} className="block">
-                    <div className="text-[14px] text-[#18191c] line-clamp-2 group-hover:text-[#00aeec]">
+                    <div className={`${isMobile ? 'text-[13px] mt-2' : 'text-[14px]'} text-[#18191c] line-clamp-2 group-hover:text-[#00aeec]`}>
                         {video.title}
                     </div>
                 </Link>
@@ -261,7 +283,7 @@ const VideoListCard = ({ video }) => {
                     </div>
                     <div className="ml-3">{video.createTime}</div>
                 </div>
-                <div className="mt-2 text-[12px] text-[#9499a0]">
+                <div className={`mt-2 ${isMobile ? 'text-[11px]' : 'text-[12px]'} text-[#9499a0]`}>
                     不知道大麦在哪直播的可以看我动态置顶或者评论区这里相互问问，Mike直播通知与白水天河更新提醒：649358957
                 </div>
             </div>
@@ -270,43 +292,55 @@ const VideoListCard = ({ video }) => {
 };
 
 export default function SubmitPage() {
-    const [viewMode, setViewMode] = useState('grid'); // 'grid' 或 'list'
+    const { isMobile, isTablet, isClient } = useResponsive();
+    const [viewMode, setViewMode] = useState(isMobile ? 'list' : 'grid'); // 移动端默认使用列表视图
+
+    // 服务端渲染占位
+    if (!isClient) {
+        return <div className="w-full h-screen flex items-center justify-center bg-[#f5f5f5]">
+            <div className="text-lg text-gray-500">加载中...</div>
+        </div>;
+    }
 
     return (
         <div className="submit-page w-full py-6">
-            <div className="flex gap-6">
+            <div className={`${isMobile ? 'flex flex-col' : 'flex gap-6'}`}>
                 {/* 左侧导航 */}
-                <LeftNav />
+                <LeftNav isMobile={isMobile} />
 
                 {/* 右侧内容区 */}
                 <div className="flex-1 bg-white rounded-lg p-6 shadow-lg">
                     <div className="flex items-center justify-between mb-5">
                         <div className="flex items-center">
-                            <span className="text-[20px] font-bold mr-3">TA的视频</span>
+                            <span className={`${isMobile ? 'text-[16px]' : 'text-[20px]'} font-bold mr-3`}>TA的视频</span>
                             <span className="text-[#9499a0]">2661</span>
                         </div>
                         <Link href="/" className='flex items-center justify-center'>
-                            <div className='flex items-center justify-center border rounded-[8px] px-4 py-2 hover:text-[#00aeec] hover:border-[#00aeec] transition-all duration-300 ease-in-out'>
-                                <i className="iconfont icon-anime mr-1" style={{ fontSize: '16px' }}></i>
-                                <span className='text-[14px] mt-[2px]'>播放全部</span>
+                            <div className={`flex items-center justify-center border rounded-[8px] ${isMobile ? 'px-3 py-1' : 'px-4 py-2'} hover:text-[#00aeec] hover:border-[#00aeec] transition-all duration-300 ease-in-out`}>
+                                <i className="iconfont icon-anime mr-1" style={{ fontSize: isMobile ? '14px' : '16px' }}></i>
+                                <span className={`${isMobile ? 'text-[12px]' : 'text-[14px]'} mt-[2px]`}>播放全部</span>
                             </div>
                         </Link>
                     </div>
 
                     {/* 筛选栏 */}
-                    <FilterBar viewMode={viewMode} onViewModeChange={setViewMode} />
+                    <FilterBar viewMode={viewMode} onViewModeChange={setViewMode} isMobile={isMobile} />
 
                     {/* 视频列表 */}
                     {viewMode === 'grid' ? (
-                        <div className="mt-4 grid grid-cols-4 gap-5">
+                        <div className={`mt-4 grid ${
+                            isMobile ? 'grid-cols-2 gap-3' : 
+                            isTablet ? 'grid-cols-3 gap-4' : 
+                            'grid-cols-4 gap-5'
+                        }`}>
                             {testData.map(video => (
-                                <VideoGridCard key={video.id} video={video} />
+                                <VideoGridCard key={video.id} video={video} isMobile={isMobile} />
                             ))}
                         </div>
                     ) : (
                         <div className="mt-4">
                             {testData.map(video => (
-                                <VideoListCard key={video.id} video={video} />
+                                <VideoListCard key={video.id} video={video} isMobile={isMobile} />
                             ))}
                         </div>
                     )}

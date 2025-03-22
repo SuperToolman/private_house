@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function GameRankList({title="热门游戏榜",iconName,backgroundColor}) {
+export default function GameRankList({title="热门游戏榜", iconName, backgroundColor, isMobile}) {
     const [gameRankList] = useState([
         {
             id: 1,
@@ -93,6 +93,16 @@ export default function GameRankList({title="热门游戏榜",iconName,backgroun
         }
     ]);
 
+    // 计算排名Badge样式
+    const getRankBadgeStyle = (rank) => {
+        switch(rank) {
+            case 1: return 'bg-amber-500 text-white';
+            case 2: return 'bg-gray-300 text-gray-800';
+            case 3: return 'bg-amber-700 text-white';
+            default: return 'bg-gray-100 text-gray-500';
+        }
+    };
+
     // 获取标签文字颜色
     const getTagTextColor = (tag) => {
         const tagColors = {
@@ -104,96 +114,82 @@ export default function GameRankList({title="热门游戏榜",iconName,backgroun
             '西幻': 'text-indigo-600',
             '角色扮演': 'text-orange-600',
             '开放世界': 'text-cyan-600',
-            '二次元': 'text-pink-600',
-            '音乐': 'text-violet-600',
-            '射击': 'text-red-500',
-            '竞技': 'text-blue-500',
-            'MOBA': 'text-purple-500',
+            '二次元': 'text-pink-600'
         };
         
         return tagColors[tag] || 'text-gray-600';
     };
 
-    // 获取排名数字的背景色
-    const getRankBadgeStyle = (rank) => {
-        if (rank === 1) return "bg-orange-500 text-white";
-        if (rank === 2) return "bg-gray-300 text-white";
-        if (rank === 3) return "bg-amber-700 text-white";
-        return "text-gray-500";
-    };
+    // 移动端显示较少的游戏
+    const visibleGames = isMobile ? gameRankList.slice(0, 3) : gameRankList;
 
     return (
-        <div className="">
-            <div className="bg-orange-50 rounded-lg p-4">
-                {/* 标题栏 */}
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold text-orange-500 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        {title}
-                    </h2>
-                    <Link href="/game/ranking" className="text-gray-500 text-sm hover:text-gray-700 flex items-center">
-                        查看更多
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                    </Link>
-                </div>
-
-                {/* 游戏排行列表 */}
-                <div className="space-y-3">
-                    {gameRankList.map((game) => (
-                        <Link href={`/game/${game.id}`} key={game.id} className="block">
-                            <div className="flex items-center bg-white rounded-lg p-3 hover:shadow-md transition-shadow">
-                                {/* 排名 */}
-                                <div className={`flex-shrink-0 w-8 h-8 rounded-full ${getRankBadgeStyle(game.rank)} flex items-center justify-center font-bold text-lg mr-3`}>
-                                    {game.rank}
-                                </div>
-                                
-                                {/* 游戏封面 */}
-                                <div className="relative w-12 h-12 flex-shrink-0 mr-3">
-                                    <Image
-                                        src={game.cover}
-                                        alt={game.title}
-                                        fill
-                                        className="object-cover rounded-lg"
-                                        sizes="48px"
-                                    />
-                                    {game.badge && (
-                                        <div className="absolute -top-1 -left-1 bg-pink-500 text-white text-[10px] px-1 rounded">
-                                            B
-                                        </div>
-                                    )}
-                                </div>
-                                
-                                {/* 游戏信息 */}
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="font-medium text-base mb-0.5">{game.title}</h3>
-                                    <div className="flex items-center">
-                                        <span className="text-amber-500 flex items-center mr-2">
-                                            <span className="text-xs mr-1">★</span>
-                                            <span className="text-sm">{game.rating}</span>
-                                        </span>
-                                        {game.tags.map((tag, index) => (
-                                            <span key={index} className={`text-xs mr-2 ${getTagTextColor(tag)}`}>
-                                                {tag}
-                                            </span>
-                                        ))}
-                                    </div>
-                                    {game.desc && (
-                                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{game.desc}</p>
-                                    )}
-                                </div>
-                                
-                                {/* 下载按钮 */}
-                                <button className={`flex-shrink-0 ${game.rank <= 3 ? 'bg-pink-500 hover:bg-pink-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'} text-white px-5 py-1.5 rounded-md text-sm font-medium transition-colors ml-3`}>
-                                    下载
-                                </button>
+        <div className={`game-rank-list rounded-lg bg-gray-50 p-4 ${isMobile ? 'mt-4' : 'mt-8'}`}>
+            <div className="flex items-center justify-between mb-4">
+                <h3 className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold flex items-center`}>
+                    {iconName && <i className={`iconfont icon-${iconName} mr-1 ${backgroundColor || 'text-blue-500'}`}></i>}
+                    {title}
+                </h3>
+                <Link href="/game/rank" className="text-blue-500 text-sm flex items-center">
+                    更多
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                </Link>
+            </div>
+            
+            <div className="space-y-3">
+                {visibleGames.map((game) => (
+                    <Link href={`/game/${game.id}`} key={game.id} className="block">
+                        <div className={`flex items-center bg-white rounded-lg ${isMobile ? 'p-2' : 'p-3'} hover:shadow-md transition-shadow`}>
+                            {/* 排名 */}
+                            <div className={`flex-shrink-0 ${isMobile ? 'w-6 h-6 text-base' : 'w-8 h-8 text-lg'} rounded-full ${getRankBadgeStyle(game.rank)} flex items-center justify-center font-bold mr-2`}>
+                                {game.rank}
                             </div>
-                        </Link>
-                    ))}
-                </div>
+                            
+                            {/* 游戏封面 */}
+                            <div className={`relative ${isMobile ? 'w-10 h-10' : 'w-12 h-12'} flex-shrink-0 mr-3`}>
+                                <Image
+                                    src={game.cover}
+                                    alt={game.title}
+                                    fill
+                                    className="object-cover rounded-lg"
+                                    sizes={isMobile ? '40px' : '48px'}
+                                />
+                                {game.badge && (
+                                    <div className="absolute -top-1 -left-1 bg-pink-500 text-white text-[10px] px-1 rounded">
+                                        B
+                                    </div>
+                                )}
+                            </div>
+                            
+                            {/* 游戏信息 */}
+                            <div className="flex-1 min-w-0">
+                                <h3 className={`font-medium ${isMobile ? 'text-sm' : 'text-base'} mb-0.5`}>{game.title}</h3>
+                                <div className="flex items-center">
+                                    <span className="text-amber-500 flex items-center mr-2">
+                                        <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} mr-0.5`}>★</span>
+                                        <span className={`${isMobile ? 'text-xs' : 'text-sm'}`}>{game.rating}</span>
+                                    </span>
+                                    {/* 移动端只显示一个标签 */}
+                                    {game.tags.slice(0, isMobile ? 1 : game.tags.length).map((tag, index) => (
+                                        <span key={index} className={`${isMobile ? 'text-[10px]' : 'text-xs'} mr-2 ${getTagTextColor(tag)}`}>
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                                {game.desc && !isMobile && (
+                                    <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{game.desc}</p>
+                                )}
+                            </div>
+                            
+                            {/* 下载按钮 */}
+                            <button className={`flex-shrink-0 ${game.rank <= 3 ? 'bg-pink-500 hover:bg-pink-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'} text-white ${isMobile ? 'px-3 py-1 text-xs' : 'px-5 py-1.5 text-sm'} rounded-md font-medium transition-colors ml-2`}>
+                                下载
+                            </button>
+                        </div>
+                    </Link>
+                ))}
             </div>
         </div>
     );

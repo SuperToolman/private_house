@@ -7,8 +7,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Autoplay, Pagination, FreeMode } from 'swiper/modules';
 import { useEffect, useState, useRef } from 'react';
+import { useResponsive } from '../../contexts/ResponsiveContext';
 
 export default function RecommandRowCarousel() {
+    const { isMobile, isTablet } = useResponsive();
+    
     // 模拟轮播图数据
     const carouselItems = [
         { id: 1, title: '碧蓝之海', image: '/images/test_manga_cover (1).webp', subtitle: '夏日冒险即将开始' },
@@ -46,47 +49,61 @@ export default function RecommandRowCarousel() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // 鼠标悬停/离开处理
+    // 鼠标悬停时减慢速度，移动时加速
     const handleMouseEnter = () => {
-        if (swiperRef.current && swiperRef.current.autoplay) {
+        setAutoplaySpeed(8000); // 更慢的速度
+        if (swiperRef.current) {
             swiperRef.current.autoplay.stop();
-        }
-    };
-
-    const handleMouseLeave = () => {
-        if (swiperRef.current && swiperRef.current.autoplay) {
             swiperRef.current.autoplay.start();
         }
     };
 
+    const handleMouseLeave = () => {
+        setAutoplaySpeed(4000); // 恢复正常速度
+        if (swiperRef.current) {
+            swiperRef.current.autoplay.stop();
+            swiperRef.current.autoplay.start();
+        }
+    };
+
+    const CarouselItem = ({ item }) => (
+        <Link href={`/manga/${item.id}`} className="block h-full">
+            <div className="carousel-item-container h-full">
+                <div className="manga-cover-container relative h-full bg-gray-200 group">
+                    {/* 图片容器 */}
+                    <div className="relative h-full overflow-hidden rounded-md">
+                        <Image
+                            src={item.image}
+                            alt={item.title}
+                            fill
+                            sizes="(max-width: 768px) 90vw, 300px"
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        {/* 渐变遮罩 */}
+                        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 to-transparent"></div>
+                    </div>
+
+                    {/* 文字内容 */}
+                    <div className="absolute bottom-0 left-0 p-3 w-full text-white">
+                        <h3 className={`font-medium ${isMobile ? 'text-sm' : 'text-base'} line-clamp-1`}>{item.title}</h3>
+                        <p className={`mt-1 ${isMobile ? 'text-xs' : 'text-sm'} text-gray-300 line-clamp-1`}>{item.subtitle}</p>
+                    </div>
+                </div>
+            </div>
+        </Link>
+    );
+
     return (
-        <div className="w-full mb-12">
-            {/* 设置CSS变量确保匀速移动和固定尺寸 */}
-            <style jsx global>{`
-                :root {
-                    --swiper-wrapper-transition-timing-function: linear !important;
-                }
-                
-                .continuous-carousel .swiper-wrapper {
-                    transition-timing-function: linear !important;
-                }
-                
-                .manga-slide {
-                    width: 219px !important;
-                    height: 288px !important;
-                }
-            `}</style>
-            
-            {/* 轮播容器，包含鼠标事件监听 */}
+        <div className={`mt-6 ${isMobile ? 'mb-3' : 'mb-6'}`}>
             <div 
-                className="carousel-wrapper" 
+                className={`relative rounded-lg bg-black/5 ${isMobile ? 'pt-2 pb-6' : 'pt-3 pb-8'}`}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
                 <Swiper
                     modules={[Autoplay, Pagination, FreeMode]}
-                    spaceBetween={16}
-                    slidesPerView="auto"
+                    spaceBetween={isMobile ? 8 : 16}
+                    slidesPerView={isMobile ? 1.2 : "auto"}
                     loop={true}
                     speed={autoplaySpeed} // 控制速度
                     autoplay={{
@@ -105,46 +122,19 @@ export default function RecommandRowCarousel() {
                 >
                     {/* 复制多份数据，确保滚动更流畅 */}
                     {[...carouselItems, ...carouselItems, ...carouselItems].map((item, index) => (
-                        <SwiperSlide key={`${item.id}-${index}`} className="manga-slide">
+                        <SwiperSlide 
+                            key={`${item.id}-${index}`} 
+                            className="manga-slide"
+                            style={{ 
+                                width: isMobile ? 'auto' : '300px',
+                                height: isMobile ? '180px' : '240px'
+                            }}
+                        >
                             <CarouselItem item={item} />
                         </SwiperSlide>
                     ))}
                 </Swiper>
             </div>
         </div>
-    );
-}
-
-function CarouselItem({ item }) {
-    return (
-        <Link href={`/manga/${item.id}`} className="block w-full h-full relative group">
-            <div className="w-full h-full relative overflow-hidden rounded-lg">
-                {/* 背景图片 */}
-                <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    sizes="219px"
-                    priority
-                />
-                
-                {/* 渐变遮罩 */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-80"></div>
-                
-                {/* 标题和描述 - 调整以适应较小的卡片尺寸 */}
-                <div className="absolute bottom-0 left-0 p-3 w-full text-white">
-                    <h3 className="text-lg font-bold mb-1 line-clamp-1">{item.title}</h3>
-                    <p className="text-xs text-gray-200 line-clamp-2">{item.subtitle}</p>
-                </div>
-                
-                {/* 透明悬浮按钮 - 调整大小以适应卡片尺寸 */}
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="bg-white/20 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-sm font-medium">
-                        立即阅读
-                    </div>
-                </div>
-            </div>
-        </Link>
     );
 }

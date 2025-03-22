@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useResponsive } from '../../../contexts/ResponsiveContext';
 
 // 测试数据
 const collectionData = [
@@ -130,7 +131,7 @@ const collectionData = [
 ];
 
 // 视频卡片组件
-const VideoCard = ({ video }) => {
+const VideoCard = ({ video, isMobile }) => {
     return (
         <div className="video-card">
             <Link href={`/video/${video.id}`} className="block group">
@@ -147,7 +148,7 @@ const VideoCard = ({ video }) => {
                     </div>
                 </div>
                 <div className="mt-3">
-                    <div className="text-[14px] text-[#18191c] line-clamp-2 group-hover:text-[#00aeec]">
+                    <div className={`${isMobile ? 'text-[13px]' : 'text-[14px]'} text-[#18191c] line-clamp-2 group-hover:text-[#00aeec]`}>
                         {video.title}
                     </div>
                     <div className="mt-2 flex items-center text-[12px] text-[#9499a0]">
@@ -168,37 +169,41 @@ const VideoCard = ({ video }) => {
 };
 
 // 合集列表组件
-const CollectionList = ({ collection }) => {
+const CollectionList = ({ collection, isMobile, isTablet }) => {
     return (
         <div className="collection-list mb-12 last:mb-0">
             {/* 合集标题和操作按钮 */}
-            <div className="flex items-center justify-between mb-4">
+            <div className={`${isMobile ? 'flex flex-col' : 'flex items-center justify-between'} mb-4`}>
                 <div className="flex items-center">
-                    <Link href={`/collection/${collection.id}`} className="text-[20px] text-[#18191c] font-medium hover:text-[#00aeec] transition-all duration-300 ease-in-out">
+                    <Link href={`/collection/${collection.id}`} className={`${isMobile ? 'text-[16px]' : 'text-[20px]'} text-[#18191c] font-medium hover:text-[#00aeec] transition-all duration-300 ease-in-out`}>
                         <span>{collection.title}</span>
                     </Link>
                     <span className="text-[#9499a0] text-[14px] ml-2">· {collection.count}</span>
                 </div>
-                <div className="flex items-center text-[14px]">
+                <div className={`flex items-center text-[14px] ${isMobile ? 'mt-3' : ''}`}>
                     <Link href="/" className='flex items-center justify-center mr-2'>
-                        <div className='flex items-center justify-center border rounded-[8px] px-4 py-2 hover:text-[#00aeec] hover:border-[#00aeec] transition-all duration-300 ease-in-out'>
-                            <i className="iconfont icon-anime mr-1" style={{ fontSize: '16px' }}></i>
-                            <span className='text-[14px] mt-[2px]'>播放全部</span>
+                        <div className={`flex items-center justify-center border rounded-[8px] ${isMobile ? 'px-2 py-1 text-[12px]' : 'px-4 py-2'} hover:text-[#00aeec] hover:border-[#00aeec] transition-all duration-300 ease-in-out`}>
+                            <i className="iconfont icon-anime mr-1" style={{ fontSize: isMobile ? '14px' : '16px' }}></i>
+                            <span className={`${isMobile ? 'text-[12px]' : 'text-[14px]'} mt-[2px]`}>播放全部</span>
                         </div>
                     </Link>
                     <Link href="/" className='flex items-center justify-center'>
-                        <div className='flex items-center justify-center border rounded-[8px] px-4 py-2 hover:text-[#00aeec] hover:border-[#00aeec] transition-all duration-300 ease-in-out'>
-                            <span className='text-[14px] mt-[2px]'>查看更多</span>
-                            <i className="iconfont icon-right mr-1" style={{ fontSize: '16px' }}></i>
+                        <div className={`flex items-center justify-center border rounded-[8px] ${isMobile ? 'px-2 py-1 text-[12px]' : 'px-4 py-2'} hover:text-[#00aeec] hover:border-[#00aeec] transition-all duration-300 ease-in-out`}>
+                            <span className={`${isMobile ? 'text-[12px]' : 'text-[14px]'} mt-[2px]`}>查看更多</span>
+                            <i className="iconfont icon-right mr-1" style={{ fontSize: isMobile ? '14px' : '16px' }}></i>
                         </div>
                     </Link>
                 </div>
             </div>
 
             {/* 视频网格 */}
-            <div className="grid grid-cols-6 gap-5">
+            <div className={`grid ${
+                isMobile ? 'grid-cols-2 gap-3' : 
+                isTablet ? 'grid-cols-4 gap-4' : 
+                'grid-cols-6 gap-5'
+            }`}>
                 {collection.videos.map(video => (
-                    <VideoCard key={video.id} video={video} />
+                    <VideoCard key={video.id} video={video} isMobile={isMobile} />
                 ))}
             </div>
         </div>
@@ -206,7 +211,7 @@ const CollectionList = ({ collection }) => {
 };
 
 // 合集卡片组件（网格视图）
-const CollectionCard = ({ collection }) => {
+const CollectionCard = ({ collection, isMobile }) => {
     return (
         <div className="collection-card">
             <Link href={`/collection/${collection.id}`} className="block group">
@@ -227,10 +232,10 @@ const CollectionCard = ({ collection }) => {
                     </div>
                 </div>
                 <div className="mt-3">
-                    <div className="text-[16px] font-medium text-[#18191c] line-clamp-1 group-hover:text-[#00aeec]">
+                    <div className={`${isMobile ? 'text-[14px]' : 'text-[16px]'} font-medium text-[#18191c] line-clamp-1 group-hover:text-[#00aeec]`}>
                         合集：{collection.title}
                     </div>
-                    <div className="mt-2 text-[14px] text-[#9499a0]">
+                    <div className={`mt-2 ${isMobile ? 'text-[12px]' : 'text-[14px]'} text-[#9499a0]`}>
                         最近更新：{collection.videos[0].createTime}
                     </div>
                 </div>
@@ -240,20 +245,28 @@ const CollectionCard = ({ collection }) => {
 };
 
 export default function CollectionPage() {
-    const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
+    const { isMobile, isTablet, isClient } = useResponsive();
+    const [viewMode, setViewMode] = useState(isMobile ? 'grid' : 'list'); // 在移动端默认使用网格视图
+
+    // 服务端渲染占位
+    if (!isClient) {
+        return <div className="w-full h-screen flex items-center justify-center bg-[#f5f5f5]">
+            <div className="text-lg text-gray-500">加载中...</div>
+        </div>;
+    }
 
     return (
-        <div className="collection-page w-full px-4 py-6">
+        <div className={`collection-page w-full ${isMobile ? 'px-2' : 'px-4'} py-6`}>
             <div className="flex items-center justify-between mb-8">
-                <div className="text-[24px] text-[#18191c] font-bold">合集列表</div>
+                <div className={`${isMobile ? 'text-[18px]' : 'text-[24px]'} text-[#18191c] font-bold`}>合集列表</div>
                 <div className="text-[14px]">
                     <button
                         onClick={() => setViewMode(viewMode === 'list' ? 'grid' : 'list')}
                         className="text-[#9499a0] hover:text-[#00aeec] flex items-center"
                     >
                         {viewMode === 'list' ?
-                            <i className='iconfont icon-view-grid hover:text-[#00aeec] transition-all duration-300 ease-in-out' style={{ fontSize: '24px' }}></i>
-                            : <i className='iconfont icon-view-list hover:text-[#00aeec] transition-all duration-300 ease-in-out' style={{ fontSize: '24px' }}></i>}
+                            <i className='iconfont icon-view-grid hover:text-[#00aeec] transition-all duration-300 ease-in-out' style={{ fontSize: isMobile ? '20px' : '24px' }}></i>
+                            : <i className='iconfont icon-view-list hover:text-[#00aeec] transition-all duration-300 ease-in-out' style={{ fontSize: isMobile ? '20px' : '24px' }}></i>}
                     </button>
                 </div>
             </div>
@@ -261,15 +274,15 @@ export default function CollectionPage() {
             {viewMode === 'list' ? (
                 // 列表视图
                 collectionData.map(collection => (
-                    <div key={collection.id} className='bg-white rounded-lg p-4 shadow-lg mb-4 last:mb-0'>
-                        <CollectionList collection={collection} />
+                    <div key={collection.id} className={`bg-white rounded-lg ${isMobile ? 'p-3' : 'p-4'} shadow-lg mb-4 last:mb-0`}>
+                        <CollectionList collection={collection} isMobile={isMobile} isTablet={isTablet} />
                     </div>
                 ))
             ) : (
                 // 网格视图
-                <div className="grid grid-cols-4 gap-6 bg-white rounded-lg p-4 shadow-lg">
+                <div className={`grid ${isMobile ? 'grid-cols-2 gap-3' : isTablet ? 'grid-cols-3 gap-4' : 'grid-cols-4 gap-6'} bg-white rounded-lg ${isMobile ? 'p-3' : 'p-4'} shadow-lg`}>
                     {collectionData.map(collection => (
-                        <CollectionCard key={collection.id} collection={collection} />
+                        <CollectionCard key={collection.id} collection={collection} isMobile={isMobile} />
                     ))}
                 </div>
             )}

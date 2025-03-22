@@ -185,7 +185,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="w-full h-[100px] md:h-[175.5px] bg-gray-100"></div>
+
       <div className="w-full h-full px-3 md:px-6 lg:px-[140px] flex flex-col">
         <NavSection categories={categories} />
         <ContentGrid videos={testVideos} />

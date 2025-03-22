@@ -17,7 +17,7 @@ const VideoCover = React.memo(({ coverUrl, isPlaying }) => (
   ));
   VideoCover.displayName = "VideoCover"; // 添加 displayName
 
-export default function VideoCardByHeader({ videoEntity }) {
+export default function VideoCardByHeader({ videoEntity, isMobile }) {
     const cardRef = useRef(null);
     const videoRef = useRef(null);
     const hoverTimeoutRef = useRef(null);
@@ -95,7 +95,10 @@ export default function VideoCardByHeader({ videoEntity }) {
         }
     }, [videoUrl, isLoading]);
 
+    // 移动端不支持hover效果，只在非移动端启用
     const handleMouseEnter = useCallback(() => {
+        if (isMobile) return;
+        
         if (isVisible && !isLoading) {
             setIsHovered(true);
             // 延迟0.5秒后播放视频
@@ -103,15 +106,17 @@ export default function VideoCardByHeader({ videoEntity }) {
                 handleVideoPlay();
             }, 500);
         }
-    }, [isVisible, isLoading, handleVideoPlay]);
+    }, [isVisible, isLoading, handleVideoPlay, isMobile]);
 
     const handleMouseLeave = useCallback(() => {
+        if (isMobile) return;
+        
         setIsHovered(false);
         if (hoverTimeoutRef.current) {
             clearTimeout(hoverTimeoutRef.current);
         }
         handleVideoPause();
-    }, [handleVideoPause]);
+    }, [handleVideoPause, isMobile]);
 
     // 在服务器端渲染时只显示封面图
     if (!mounted) {
@@ -119,7 +124,7 @@ export default function VideoCardByHeader({ videoEntity }) {
             <div className="video-card-wrap relative">
                 <div className="video-card-cover">
                     <Link href={`/video/${videoEntity.id}`} prefetch={false}>
-                        <div className="video-card-cover-img rounded-[10px] overflow-hidden w-full h-full relative">
+                        <div className={`video-card-cover-img rounded-[10px] overflow-hidden w-full ${isMobile ? 'aspect-video' : 'h-full'} relative`}>
                             <VideoCover 
                                 coverUrl={videoEntity.coverUrl}
                                 isPlaying={false}
@@ -127,7 +132,7 @@ export default function VideoCardByHeader({ videoEntity }) {
                         </div>
                     </Link>
                     <Link href={`/video/${videoEntity.id}`} prefetch={false}>
-                        <div className="hover:text-[#00aeec] transition-colors duration-300 video-card-title text-[14px] text-[#18191c] mt-[10px]">
+                        <div className={`hover:text-[#00aeec] transition-colors duration-300 video-card-title ${isMobile ? 'text-base line-clamp-2' : 'text-[14px]'} text-[#18191c] mt-[10px]`}>
                             <span>{videoEntity.title}</span>
                         </div>
                     </Link>
@@ -141,7 +146,7 @@ export default function VideoCardByHeader({ videoEntity }) {
             <div className="video-card-wrap relative">
                 <div className="video-card-cover">
                     <Link href={`/video/${videoEntity.id}`} prefetch={false}>
-                        <div className="video-card-cover-img rounded-[10px] overflow-hidden w-full h-full relative">
+                        <div className={`video-card-cover-img rounded-[10px] overflow-hidden w-full ${isMobile ? 'aspect-video' : 'h-full'} relative`}>
                             <VideoCover 
                                 coverUrl={videoEntity.coverUrl}
                                 isPlaying={isPlaying}
@@ -156,10 +161,24 @@ export default function VideoCardByHeader({ videoEntity }) {
                                     preload="none"
                                 />
                             )}
+                            
+                            {/* 播放按钮 - 在移动端显示 */}
+                            {isMobile && (
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="w-12 h-12 rounded-full bg-black bg-opacity-50 flex items-center justify-center">
+                                        <i className="iconfont icon-movie text-white" style={{ fontSize: '24px' }}></i>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {/* 视频信息 (播放时长等) */}
+                            <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-1 rounded">
+                                {videoEntity.duration || '00:00'}
+                            </div>
                         </div>
                     </Link>
                     <Link href={`/video/${videoEntity.id}`} prefetch={false}>
-                        <div className="hover:text-[#00aeec] transition-colors duration-300 video-card-title text-[14px] text-[#18191c] mt-[10px]">
+                        <div className={`hover:text-[#00aeec] transition-colors duration-300 video-card-title ${isMobile ? 'text-base line-clamp-2' : 'text-[14px]'} text-[#18191c] mt-[10px]`}>
                             <span>{videoEntity.title}</span>
                         </div>
                     </Link>

@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function RecommandGameList() {
+export default function RecommandGameList({ isMobile, isTablet }) {
     const [recommandGameList] = useState([
         {
             id: 1,
@@ -126,6 +126,21 @@ export default function RecommandGameList() {
         }
     ]);
 
+    // 计算每行游戏数量
+    const getGameCountPerRow = () => {
+        if (isMobile) return 2;
+        if (isTablet) return 4;
+        return 6;
+    };
+
+    // 计算要显示的游戏数量
+    const [visibleGames, setVisibleGames] = useState([]);
+    
+    useEffect(() => {
+        const gameCount = getGameCountPerRow() * (isMobile ? 2 : isTablet ? 2 : 2);
+        setVisibleGames(recommandGameList.slice(0, gameCount));
+    }, [isMobile, isTablet, recommandGameList]);
+
     // 获取标签背景色
     const getTagBgColor = (tag) => {
         const tagColors = {
@@ -160,10 +175,10 @@ export default function RecommandGameList() {
     };
 
     return (
-        <div className="w-[1584px] mx-auto py-8">
+        <div className={`${isMobile ? 'w-full' : isTablet ? 'w-full' : 'w-[1584px]'} mx-auto py-4 ${isMobile ? 'pb-2' : 'py-8'}`}>
             {/* 标题 */}
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">热门游戏推荐</h2>
+            <div className="flex items-center justify-between mb-4">
+                <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold`}>热门游戏推荐</h2>
                 <Link href="/games" className="text-blue-500 text-sm flex items-center">
                     更多
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -173,69 +188,75 @@ export default function RecommandGameList() {
             </div>
 
             {/* 游戏列表 */}
-            <div className="grid grid-cols-6 gap-4">
-                {recommandGameList.map((game) => (
+            <div className={`grid ${
+                isMobile 
+                    ? 'grid-cols-2 gap-3' 
+                    : isTablet 
+                        ? 'grid-cols-4 gap-4' 
+                        : 'grid-cols-6 gap-4'
+            }`}>
+                {visibleGames.map((game) => (
                     <Link href={`/game/${game.id}`} key={game.id} className="block group">
                         <div className="game-card relative">
                             {/* PC标识 */}
                             {game.badgeText === 'PC' && (
-                                <div className="absolute top-2 right-2 bg-white text-black font-medium px-2 py-0.5 rounded text-xs z-10">
+                                <div className={`absolute top-2 right-2 bg-white text-black font-medium ${isMobile ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-0.5 text-xs'} rounded z-10`}>
                                     PC
                                 </div>
                             )}
 
                             {/* 封面 */}
-                            <div className="relative h-[160px] w-full rounded-lg overflow-hidden mb-2">
+                            <div className={`relative ${isMobile ? 'h-[120px]' : 'h-[160px]'} w-full rounded-lg overflow-hidden mb-2`}>
                                 <Image 
                                     src={game.cover}
                                     alt={game.title}
                                     fill
                                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                                    sizes="180px"
+                                    sizes={isMobile ? '160px' : '180px'}
                                 />
                                 
                                 {/* 游戏徽章 */}
                                 {game.badge && (
                                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
                                         <div className="flex items-center">
-                                            <span className="text-xs text-white font-medium">{game.badge}</span>
+                                            <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-white font-medium`}>{game.badge}</span>
                                         </div>
                                     </div>
                                 )}
                             </div>
                             
                             {/* 游戏信息 */}
-                            <div className="flex items-start space-x-2">
+                            <div className={`flex ${isMobile ? 'space-x-1.5' : 'space-x-2'}`}>
                                 {/* 头像 */}
-                                <div className="relative w-10 h-10 flex-shrink-0">
+                                <div className={`relative ${isMobile ? 'w-8 h-8' : 'w-10 h-10'} flex-shrink-0`}>
                                     <Image
                                         src={game.avatar}
                                         alt={`${game.title} avatar`}
                                         fill
                                         className="object-cover rounded-md"
-                                        sizes="40px"
+                                        sizes={isMobile ? '32px' : '40px'}
                                     />
                                 </div>
                                 
                                 {/* 标题和标签 */}
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="font-medium text-sm mb-1 text-gray-900 line-clamp-1">{game.title}</h3>
+                                    <h3 className={`font-medium ${isMobile ? 'text-xs' : 'text-sm'} mb-1 line-clamp-1 text-gray-900`}>{game.title}</h3>
                                     
-                                    <div className="flex items-center text-sm text-gray-600 mb-1.5">
+                                    <div className={`flex items-center ${isMobile ? 'text-[10px]' : 'text-sm'} text-gray-600 mb-1`}>
                                         <span className="flex items-center text-amber-500">
-                                            <span className="text-xs mr-1">★</span>
+                                            <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} mr-0.5`}>★</span>
                                             <span>{game.rating}</span>
                                         </span>
                                         <span className="mx-1 text-gray-300">|</span>
-                                        <span className="text-xs text-gray-500">{game.ratingText}</span>
+                                        <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-gray-500`}>{game.ratingText}</span>
                                     </div>
                                     
-                                    {/* 标签 */}
+                                    {/* 标签 - 移动端只显示一个 */}
                                     <div className="flex flex-wrap gap-1">
-                                        {game.tags.map((tag, index) => (
+                                        {game.tags.slice(0, isMobile ? 1 : 2).map((tag, index) => (
                                             <span 
                                                 key={index} 
-                                                className={`text-xs py-0.5 px-1.5 rounded text-white ${getTagBgColor(tag)}`}
+                                                className={`${getTagBgColor(tag)} ${isMobile ? 'text-[8px] px-1 py-0' : 'text-xs px-1.5 py-0.5'} text-white rounded`}
                                             >
                                                 {tag}
                                             </span>

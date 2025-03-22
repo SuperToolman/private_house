@@ -4,6 +4,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState, use, useEffect, createContext, useContext } from 'react';
 import React from 'react';
+import { useResponsive } from '../../contexts/ResponsiveContext';
+import SpaceNav from './components/SpaceNav';
 
 // 创建上下文
 export const SpaceContext = createContext();
@@ -11,6 +13,8 @@ export const SpaceContext = createContext();
 export default function SpaceLayout({ children, params }) {
     const { id } = use(params);
     const [isExpanded, setIsExpanded] = useState(false);
+    const { isMobile, isTablet, isClient } = useResponsive();
+    
     const [spaceInfo, setSpaceInfo] = useState({
         avatarUrl: `/images/testavatar.webp`,
         name: '用户' + id,
@@ -149,6 +153,12 @@ export default function SpaceLayout({ children, params }) {
 
 
     useEffect(() => {
+        // 在移动端禁用展开效果
+        if (isMobile) {
+            setIsExpanded(false);
+            return;
+        }
+        
         // 添加平滑滚动效果
         document.documentElement.style.scrollBehavior = 'smooth';
         
@@ -189,12 +199,23 @@ export default function SpaceLayout({ children, params }) {
             window.removeEventListener('scroll', handleScroll);
             clearTimeout(scrollTimeout);
         };
-    }, [isExpanded]);
+    }, [isExpanded, isMobile]);
+
+    // 如果在服务端渲染或数据加载中，显示加载状态
+    if (!isClient) {
+        return (
+            <div className="w-full h-screen flex items-center justify-center bg-[#f5f5f5]">
+                <div className="text-lg text-gray-500">加载中...</div>
+            </div>
+        );
+    }
 
     return (
         <SpaceContext.Provider value={spaceInfo}>
             <>
-                <div className={`flex flex-1 items-end w-full bg-gray-100 bg-cover bg-center z-[-1] shadow-lg relative transition-all duration-300 ease-in-out ${spaceInfo.backgroundType === 1 && isExpanded ? 'h-[80vh]' : 'h-[50vh]'}`}>
+                <div className={`flex flex-1 items-end w-full bg-gray-100 bg-cover bg-center z-[-1] shadow-lg relative transition-all duration-300 ease-in-out ${
+                    spaceInfo.backgroundType === 1 && isExpanded ? 'h-[80vh]' : isMobile ? 'h-[30vh]' : 'h-[50vh]'
+                }`}>
                     {/* 用户个人主页背景 */}
                     <div className="absolute top-0 left-0 w-full h-full">
                         {spaceInfo.backgroundType === 1 ? (
@@ -220,7 +241,7 @@ export default function SpaceLayout({ children, params }) {
                     </div>
 
                     {/* 用户信息卡片 */}
-                    <div className={`mb-[20px] mx-[90px] flex items-center w-full justify-between relative z-10 transition-opacity duration-300 ${isExpanded ? 'opacity-0' : 'opacity-100'}`}>
+                    <div className={`${isMobile ? 'mb-[10px] mx-[20px]' : isTablet ? 'mb-[15px] mx-[40px]' : 'mb-[20px] mx-[90px]'} flex items-center w-full justify-between relative z-10 transition-opacity duration-300 ${isExpanded ? 'opacity-0' : 'opacity-100'}`}>
                         {/* 左部分 */}
                         <div className="flex items-center-left">
                             <div className="user-info-card flex items-center">
@@ -229,107 +250,52 @@ export default function SpaceLayout({ children, params }) {
                                     <Image
                                         src={spaceInfo.avatarUrl}
                                         alt="用户头像"
-                                        width={70}
-                                        height={70}
+                                        width={isMobile ? 50 : 70}
+                                        height={isMobile ? 50 : 70}
                                         className="rounded-full"
                                     />
                                 </div>
-                                <div className="user-info-card-info ml-[20px]">
+                                <div className={`user-info-card-info ${isMobile ? 'ml-[10px]' : 'ml-[20px]'}`}>
                                     {/* 用户名 */}
                                     <div className="user-info-card-name">
-                                        <div className="user-info-card-name-text text-[20px] font-weight-[600] mt-[10px] mb-[5px] text-[#fff] font-bold">
+                                        <div className={`user-info-card-name-text ${isMobile ? 'text-[16px]' : 'text-[20px]'} font-weight-[600] mt-[10px] mb-[5px] text-[#fff] font-bold`}>
                                             {spaceInfo.name}
                                         </div>
                                     </div>
                                     {/* 简介 */}
-                                    <div className="user-info-card-description text-[16px] text-[#9499a0]">
+                                    <div className={`user-info-card-description ${isMobile ? 'text-[12px]' : 'text-[16px]'} text-[#9499a0]`}>
                                         {spaceInfo.description}
                                     </div>
                                 </div>
-
                             </div>
                         </div>
-                        {/* 右部分 */}
-                        <div className="flex items-center-right">
-                            {/* 关注与发消息的按钮 */}
-                            <div className="flex items-center space-x-[24px]">
-                                <button className="flex items-center justify-center cursor-pointer text-[#fff] font-weight-[600] text-[14px] bg-[#00aeec] text-[#fff] px-[10px] py-[8px] rounded-[8px] w-[150px]">
-                                    <i className="iconfont icon-guanzhu mr-[4px]" style={{ fontSize: '18px' }}></i>
-                                    <span>关注</span>
-                                </button>
-                                <button className="cursor-pointer text-[#fff] font-weight-[600] text-[14px] bg-[#ffffff24] text-[#fff] px-[10px] py-[8px] rounded-[8px] w-[150px]">发消息</button>
-                                <div className="cursor-pointer text-[#fff] font-weight-[600] text-[14px] bg-[#ffffff24] text-[#fff] px-[10px] py-[8px] rounded-[8px]">
-                                    <i className="iconfont icon-more-vertical-fill" style={{ fontSize: '18px' }}></i>
-                                </div>
-                            </div>
+
+                        {/* 右部分：关注按钮等 */}
+                        <div className={`${isMobile ? 'hidden' : ''}`}>
+                            <button className="bg-[#00aeec] text-white rounded-[5px] text-[16px] px-[20px] py-[6px] cursor-pointer transition-colors hover:bg-[#00a1d6]">
+                                关注
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                {/* 导航与内容 */}
-                <div className="bg-[#fcfcfc] pt-6">
-                    {/* 空间导航 */}
-                    <div className='flex flex-1 items-center justify-between mx-[90px] px-[10px] py-[10px] rounded-[50px] bg-[#fff] shadow-xl'>
-                        <div className="space-nav-wrap flex items-center  space-x-[20px] font-weight-[600]  bg-white">
-                            <div className="space-nav-item group flex items-center cursor-pointer">
-                                <Link href={`/space/${id}`}>
-                                    <i className="iconfont icon-home mr-[4px]" style={{ fontSize: '20px', color: '#0e8350' }}></i>
-                                    <span className="space-nav-item-text text-[16px] group-hover:text-[#0e8350] transition-colors duration-300">主页</span>
-                                </Link>
-                            </div>
-                            <div className="space-nav-item group flex items-center cursor-pointer">
-                                <Link href={`/space/${id}/dynamic`}>
-                                    <i className="iconfont icon-header_dyanmic mr-[4px]" style={{ fontSize: '22px', color: '#ff6699' }}></i>
-                                    <span className="space-nav-item-text text-[16px] group-hover:text-[#ff6699] transition-colors duration-300">动态</span>
-                                </Link>
-                            </div>
-                            <div className="space-nav-item group flex items-center cursor-pointer">
-                                <Link href={`/space/${id}/submit`}>
-                                    <i className="iconfont icon-tv mr-[4px]" style={{ fontSize: '20px', color: '#00aeec' }}></i>
-                                    <span className="space-nav-item-text text-[16px] group-hover:text-[#00aeec] transition-colors duration-300">投稿</span>
-                                </Link>
-                            </div>
-                            <div className="space-nav-item group flex items-center cursor-pointer">
-                                <Link href={`/space/${id}/collection`}>
-                                    <i className="iconfont icon-heji mr-[4px]" style={{ fontSize: '22px', color: '#40c5f1' }}></i>
-                                    <span className="space-nav-item-text text-[16px] group-hover:text-[#40c5f1] transition-colors duration-300">合集</span>
-                                </Link>
-                            </div>
-                            <div className="space-nav-item group flex items-center cursor-pointer">
-                                <Link href={`/space/${id}/collect`}>
-                                    <i className="iconfont icon-header_shoucang mr-[4px]" style={{ fontSize: '20px', color: '#ffb027' }}></i>
-                                    <span className="space-nav-item-text text-[16px] group-hover:text-[#ffb027] transition-colors duration-300">收藏</span>
-                                </Link>
-                            </div>
-                            {/* 视频、动态一体式搜索 */}
-                            <div className="space-nav-item">
-                                <input type="text" className="space-nav-item-input" placeholder="搜索" />
-                                <span className="space-nav-item-text">搜索</span>
-                            </div>
-                        </div>
-                        <div className="user-info-card-data-wrap flex items-center text-[#000] space-x-[25px]">
-                            <div className="user-info-card-data-item flex flex-col items-center text-[13px] cursor-pointer hover:text-[#00aeec] transition-colors duration-300">
-                                <span className='data__title'>关注</span>
-                                <span className='data__value'>{spaceInfo.followCount}</span>
-                            </div>
-                            <div className="user-info-card-data-item flex flex-col items-center text-[13px] cursor-pointer hover:text-[#00aeec] transition-colors duration-300">
-                                <span className='data__title'>粉丝数</span>
-                                <span className='data__value'>{spaceInfo.followerCount}</span>
-                            </div>
-                            <div className="user-info-card-data-item flex flex-col items-center text-[13px] cursor-pointer hover:text-[#00aeec] transition-colors duration-300">
-                                <span className='data__title'>获赞数</span>
-                                <span className='data__value'>{spaceInfo.likeCount}</span>
-                            </div>
-                            <div className="user-info-card-data-item flex flex-col items-center text-[13px] cursor-pointer hover:text-[#00aeec] transition-colors duration-300">
-                                <span className='data__title'>播放数</span>
-                                <span className='data__value'>{spaceInfo.playCount}</span>
-                            </div>
-                        </div>
+                {/* 移动端显示关注按钮 */}
+                {isMobile && (
+                    <div className="flex justify-end px-4 py-2 bg-white shadow">
+                        <button className="bg-[#00aeec] text-white rounded-[5px] text-[14px] px-[15px] py-[4px] cursor-pointer transition-colors hover:bg-[#00a1d6]">
+                            关注
+                        </button>
                     </div>
-                    {/* 作品内容 */}
-                    <div className="flex flex-1 mx-[90px] mt-[20px]">
-                        {children}
-                    </div>
+                )}
+
+                {/* 导航栏 - 确保居中 */}
+                <div className="max-w-[1200px] mx-auto">
+                    <SpaceNav userId={id} isMobile={isMobile} isTablet={isTablet} />
+                </div>
+
+                {/* 主体内容部分 */}
+                <div className={`p-5 ${isMobile ? 'py-3' : 'py-5'} max-w-[1200px] mx-auto`}>
+                    {children}
                 </div>
             </>
         </SpaceContext.Provider>

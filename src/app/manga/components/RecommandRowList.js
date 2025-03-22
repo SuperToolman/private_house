@@ -1,8 +1,10 @@
-import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
+import { useResponsive } from '../../contexts/ResponsiveContext';
 
 export default function RecommandRowList() {
+    const { isMobile, isTablet } = useResponsive();
     const [currentPage, setCurrentPage] = useState(0);
     
     // 更新漫画数据以匹配图片
@@ -10,38 +12,38 @@ export default function RecommandRowList() {
         [
             { 
                 id: 1, 
-                title: '入间同学入魔了！', 
+                title: '碧蓝之海', 
                 image: '/images/test_manga_cover (1).webp', 
                 tags: ['冒险', '奇幻'],
-                hotCount: 112 
+                hotCount: 247 
             },
             { 
                 id: 2, 
-                title: '反派师尊的我带着徒弟们翻身了', 
+                title: '女神家的慕琴',
                 image: '/images/test_manga_cover (2).webp', 
-                tags: ['穿越', '恋爱天'],
-                hotCount: 65 
+                tags: ['穿越', '恋爱'],
+                hotCount: 183 
             },
             { 
                 id: 3, 
-                title: '香格里拉边境~举作猎人与青鸟的诅咒~', 
+                title: '夏衣·伊人·梦河', 
                 image: '/images/test_manga_cover (3).webp', 
-                tags: ['战斗', '学生'],
-                hotCount: 92 
+                tags: ['恋爱', '修罗场'],
+                hotCount: 145 
             },
             { 
                 id: 4, 
-                title: '我的假女友正全力防御她的百合FLAG', 
+                title: '男女恋爱的我们', 
                 image: '/images/test_manga_cover (4).webp', 
-                tags: ['恋爱', '修罗场'],
-                hotCount: 44 
+                tags: ['战斗', '学生'],
+                hotCount: 132 
             },
             { 
                 id: 5, 
-                title: '金田一少年事件簿', 
+                title: '私奔女友的秘密', 
                 image: '/images/test_manga_cover (1).webp', 
-                tags: ['推理', '学生'],
-                hotCount: 38 
+                tags: ['推理', '热血'],
+                hotCount: 125 
             }
         ],
         [
@@ -113,86 +115,91 @@ export default function RecommandRowList() {
         setCurrentPage(1);
     };
 
+    // 根据设备类型计算要展示的漫画数量
+    const displayCount = isMobile ? 3 : isTablet ? 4 : 5;
+    const currentPageData = mangaData[currentPage].slice(0, displayCount);
+
     return (
-        <div className="w-[1160px] mx-auto py-6">
-            {/* 漫画列表容器 */}
-            <div className="relative">
-                {/* 漫画卡片列表 */}
-                <div className="flex justify-between overflow-hidden transition-all duration-300 ease-in-out">
-                    {mangaData[currentPage].map((manga) => (
-                        <Link href={`/manga/${manga.id}`} key={manga.id} className="block">
-                            <div className="manga-card w-[210px] rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
-                                <div className="relative h-[280px] w-full">
-                                    <Image 
+        <div className={`mt-6 ${isMobile ? 'mb-4' : 'mb-8'}`}>
+            <div className="flex flex-wrap">
+                {currentPageData.map((manga, index) => (
+                    <div 
+                        key={manga.id} 
+                        className={`
+                            ${isMobile 
+                                ? 'w-1/3 px-1 mb-3' 
+                                : isTablet 
+                                    ? 'w-1/4 px-2 mb-4' 
+                                    : 'w-1/5 px-2 mb-4'
+                            }
+                        `}
+                    >
+                        <div className="bg-white rounded-lg overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md">
+                            <Link href={`/manga/${manga.id}`} className="block">
+                                {/* 漫画封面 */}
+                                <div className={`relative ${isMobile ? 'h-40' : 'h-52'} overflow-hidden`}>
+                                    <Image
                                         src={manga.image}
                                         alt={manga.title}
                                         fill
-                                        className="object-cover"
-                                        sizes="210px"
+                                        className="object-cover transition-transform duration-500 hover:scale-105"
+                                        sizes={isMobile ? '33vw' : isTablet ? '25vw' : '20vw'}
                                     />
-                                    {/* 标签显示 */}
-                                    <div className="absolute left-2 top-2 flex gap-1 flex-wrap">
-                                        {manga.tags.map((tag, index) => (
+                                </div>
+                                
+                                {/* 漫画信息 */}
+                                <div className={`p-2 ${isMobile ? 'pt-1' : 'pt-3'}`}>
+                                    <h3 className={`text-gray-800 line-clamp-1 font-medium ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                                        {manga.title}
+                                    </h3>
+                                    
+                                    {/* 标签 */}
+                                    <div className={`flex mt-1 ${isMobile ? 'space-x-1' : 'space-x-2'}`}>
+                                        {manga.tags.map((tag, tagIndex) => (
                                             <span 
-                                                key={index} 
-                                                className={`text-xs py-0.5 px-2 rounded text-white ${getTagBgColor(tag)}`}
+                                                key={tagIndex} 
+                                                className={`${getTagBgColor(tag)} text-white rounded-sm ${isMobile ? 'px-1 text-[8px]' : 'px-1.5 py-0.5 text-xs'}`}
                                             >
                                                 {tag}
                                             </span>
                                         ))}
                                     </div>
-                                </div>
-                                <div className="px-2 py-3 bg-white">
-                                    <h3 className="font-medium text-sm mb-1.5 line-clamp-1 text-gray-800">{manga.title}</h3>
-                                    <div className="flex items-center text-xs text-orange-500">
-                                        <span className="mr-1">{manga.hotCount}</span>
-                                        <span>人热议中</span>
+                                    
+                                    {/* 热度 */}
+                                    <div className={`flex items-center mt-1 text-gray-500 ${isMobile ? 'text-[10px]' : 'text-xs'}`}>
+                                        <i className="fas fa-fire text-orange-500 mr-1"></i>
+                                        <span>{manga.hotCount}热度</span>
                                     </div>
                                 </div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-                
-                {/* 左箭头 - 仅在第二页显示 */}
-                {currentPage === 1 && (
-                    <button 
-                        onClick={handlePrevPage}
-                        className="absolute left-[-20px] top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-100 border border-gray-200"
-                        aria-label="上一页"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </button>
-                )}
-                
-                {/* 右箭头 - 仅在第一页显示 */}
-                {currentPage === 0 && (
-                    <button 
-                        onClick={handleNextPage}
-                        className="absolute right-[-20px] top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-100 border border-gray-200"
-                        aria-label="下一页"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                )}
+                            </Link>
+                        </div>
+                    </div>
+                ))}
             </div>
             
-            {/* 页码指示器 */}
-            <div className="flex justify-center mt-4 gap-2">
+            {/* 分页按钮 */}
+            <div className={`flex justify-center mt-4 ${isMobile ? 'space-x-3' : 'space-x-4'}`}>
                 <button 
-                    className={`w-2 h-2 rounded-full ${currentPage === 0 ? 'bg-blue-600' : 'bg-gray-300'}`}
                     onClick={handlePrevPage}
-                    aria-label="第一页"
-                ></button>
+                    className={`
+                        ${currentPage === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} 
+                        text-white ${isMobile ? 'px-3 py-1 text-xs' : 'px-4 py-2'} rounded-md transition-colors
+                    `}
+                    disabled={currentPage === 0}
+                >
+                    上一页
+                </button>
+                
                 <button 
-                    className={`w-2 h-2 rounded-full ${currentPage === 1 ? 'bg-blue-600' : 'bg-gray-300'}`}
                     onClick={handleNextPage}
-                    aria-label="第二页"
-                ></button>
+                    className={`
+                        ${currentPage === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} 
+                        text-white ${isMobile ? 'px-3 py-1 text-xs' : 'px-4 py-2'} rounded-md transition-colors
+                    `}
+                    disabled={currentPage === 1}
+                >
+                    下一页
+                </button>
             </div>
         </div>
     );

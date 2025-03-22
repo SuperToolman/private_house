@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useState } from 'react';
+import { useState, useEffect, use } from 'react';
 // import { useParams } from "react-router"
 import Image from "next/image"
 import VideoPlayer from "./components/VideoPlayer"
@@ -8,11 +8,17 @@ import Tag from "./components/Tag"
 import VideoComment from "./components/VideoComment"
 import VideoRecommendList from "./components/VideoRecommendList"
 import Link from 'next/link';
+import { useResponsive } from '../../contexts/ResponsiveContext';
 
 export default function VideoInfo({ params }) {
-    const { id } = use(params);
+    // 使用use钩子解析params
+    const resolvedParams = use(params);
+    const videoId = resolvedParams.id;
+    
     const [inputValue, setInputValue] = useState('');
     const [isFocused, setIsFocused] = useState(false);
+    const [activeTab, setActiveTab] = useState('recommend'); // 'recommend' 或 'comment'
+    const { isMobile, isTablet, isClient } = useResponsive();
 
     const inputClassName = `flex-1 px-4 py-2 border rounded-lg h-[50px] transition-colors duration-200 ${(inputValue || isFocused)
         ? 'bg-white border-[#9ccd0]'
@@ -186,14 +192,21 @@ export default function VideoInfo({ params }) {
         ]
     }
 
+    // 服务端渲染时返回占位内容，避免hydration错误
+    if (!isClient) {
+        return <div className="w-full h-screen bg-[#f5f5f5] flex items-center justify-center">
+            <div className="text-lg text-gray-500">加载中...</div>
+        </div>;
+    }
+
     return (
-        <div className="w-full px-10 mt-5">
-            <div className="flex justify-between w-full h-full">
+        <div className={`w-full ${isMobile ? 'px-3' : isTablet ? 'px-5' : 'px-10'} mt-5`}>
+            <div className={`${isMobile ? 'flex-col' : 'flex justify-between'} w-full h-full`}>
                 {/* 左侧内容 */}
                 <div className="flex-1 h-full flex flex-col">
                     {/* 视频信息 */}
                     <div className="mb-5">
-                        <div className="text-[22px] font-semibold text-[#18191c] mb-[15px]">
+                        <div className={`${isMobile ? 'text-lg' : 'text-[22px]'} font-semibold text-[#18191c] mb-[15px]`}>
                             {testVideoObject.title}
                         </div>
                         <div className="flex text-[13px] text-[#9499a0]">
@@ -219,123 +232,185 @@ export default function VideoInfo({ params }) {
                     {/* 视频数据 */}
                     <div className="flex text-[#61666d] transition-all duration-300 border-b border-[#e5e5e5]">
                         <div className="py-[18px] pb-5 hover:text-[#00aeec] transition-all duration-300 cursor-pointer mr-[45px] flex items-center">
-                            <i className="iconfont icon-info-dianzhan mr-[5px]" style={{ fontSize: '30px' }}></i>
+                            <i className="iconfont icon-info-dianzhan mr-[5px]" style={{ fontSize: isMobile ? '24px' : '30px' }}></i>
                             <span className="text-sm pt-1">4494</span>
                         </div>
                         <div className="py-[18px] pb-5 hover:text-[#00aeec] transition-all duration-300 cursor-pointer mr-[45px] flex items-center">
-                            <i className="iconfont icon-info-toubi mr-[5px]" style={{ fontSize: '30px' }}></i>
+                            <i className="iconfont icon-info-toubi mr-[5px]" style={{ fontSize: isMobile ? '24px' : '30px' }}></i>
                             <span className="text-sm pt-1">4494</span>
                         </div>
                         <div className="py-[18px] pb-5 hover:text-[#00aeec] transition-all duration-300 cursor-pointer mr-[45px] flex items-center">
-                            <i className="iconfont icon-info-shouchang mr-[5px]" style={{ fontSize: '30px' }}></i>
+                            <i className="iconfont icon-info-shouchang mr-[5px]" style={{ fontSize: isMobile ? '24px' : '30px' }}></i>
                             <span className="text-sm pt-1">4494</span>
                         </div>
                         <div className="py-[18px] pb-5 hover:text-[#00aeec] transition-all duration-300 cursor-pointer mr-[45px] flex items-center">
-                            <i className="iconfont icon-info-zhuanfa mr-[5px]" style={{ fontSize: '30px' }}></i>
+                            <i className="iconfont icon-info-zhuanfa mr-[5px]" style={{ fontSize: isMobile ? '24px' : '30px' }}></i>
                             <span className="text-sm pt-1">4494</span>
                         </div>
                     </div>
 
+                    {/* 用户信息 - 移动端显示 */}
+                    {isMobile && (
+                        <div className="flex items-center my-4 border-b border-[#e5e5e5] pb-4">
+                            <div className="w-12 h-12 rounded-full overflow-hidden mr-3">
+                                <Link href={`/space/${testVideoObject.user.id}`}>
+                                    <Image
+                                        src={testVideoObject.user.avatarUrl}
+                                        alt="User avatar"
+                                        width={48}
+                                        height={48}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </Link>
+                            </div>
+                            <div className="flex-1">
+                                <div className="text-base font-semibold mb-1 text-[#18191c]">
+                                    <Link href={`/space/${testVideoObject.user.id}`}>
+                                        {testVideoObject.user.name}
+                                    </Link>
+                                </div>
+                                <div className="text-sm text-[#9499a0]">
+                                    {testVideoObject.user.desc}
+                                </div>
+                            </div>
+                            <button className="px-4 py-1.5 bg-[#00aeec] text-white rounded-[5px] text-sm flex items-center">
+                                <i className="iconfont icon-guanzhu mr-1"></i>
+                                <span>关注</span>
+                            </button>
+                        </div>
+                    )}
+
                     {/* 视频简介 */}
                     <div className="my-[18px]">
-                        <span className="text-base leading-[26px]">
+                        <span className={`${isMobile ? 'text-sm' : 'text-base'} leading-[26px]`}>
                             {testVideoObject.desc}
                         </span>
                     </div>
 
                     {/* 标签 */}
-                    <div className="flex border-b border-[#e5e5e5] pb-[18px] mb-[18px]">
+                    <div className="flex flex-wrap border-b border-[#e5e5e5] pb-[18px] mb-[18px]">
                         {testVideoObject.tagStr.split(',').map((tag, index) => (
                             <Tag key={index} tagContent={tag} />
                         ))}
                     </div>
 
-                    {/* 评论 */}
-                    <div>
-                        <div className="flex items-center mb-[18px]">
-                            <div className="flex items-center">
-                                <span className='text-[24px] text-[#18191c]'>评论</span>
-                                <span className="ml-2 text-[14px] text-[#9499a0] ml-[15px] mr-[30px]  pt-[3px]">74</span>
-                            </div>
-                            <div className="flex items-center">
-                                <span className="mr-4 cursor-pointer">最热</span>
-                                <span className="cursor-pointer">最新</span>
-                            </div>
-                        </div>
-
-                        {/* 评论输入框 */}
-                        <div className="flex items-center mb-[18px]">
-                            <div className="w-[48px] h-[48px] rounded-full overflow-hidden mr-2.5">
-                                <Image
-                                    src={testVideoObject.user.avatarUrl}
-                                    alt="User avatar"
-                                    width={48}
-                                    height={48}
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
-                            <input
-                                type="text"
-                                placeholder="说点什么..."
-                                className={inputClassName}
-                                value={inputValue}
-                                onChange={(e) => setInputValue(e.target.value)}
-                                onFocus={() => setIsFocused(true)}
-                                onBlur={() => setIsFocused(false)}
-                            />
-                            <button className="px-6 py-2 bg-[#00aeec] text-white rounded-lg hover:bg-[#0096cc] transition-colors duration-200">
-                                发送
+                    {/* 移动端选项卡切换 */}
+                    {isMobile && (
+                        <div className="flex border-b border-[#e5e5e5] mb-4">
+                            <button 
+                                className={`flex-1 py-3 text-center ${activeTab === 'recommend' ? 'text-[#00aeec] border-b-2 border-[#00aeec]' : 'text-[#61666d]'}`}
+                                onClick={() => setActiveTab('recommend')}
+                            >
+                                推荐
+                            </button>
+                            <button 
+                                className={`flex-1 py-3 text-center ${activeTab === 'comment' ? 'text-[#00aeec] border-b-2 border-[#00aeec]' : 'text-[#61666d]'}`}
+                                onClick={() => setActiveTab('comment')}
+                            >
+                                评论({testVideoObject.commentItems.length})
                             </button>
                         </div>
+                    )}
 
-                        <VideoComment commentItems={testVideoObject.commentItems} />
-                    </div>
+                    {/* 评论区 - 在移动端根据选项卡显示 */}
+                    {(!isMobile || (isMobile && activeTab === 'comment')) && (
+                        <div>
+                            {!isMobile && (
+                                <div className="flex items-center mb-[18px]">
+                                    <div className="flex items-center">
+                                        <span className='text-[24px] text-[#18191c]'>评论</span>
+                                        <span className="ml-2 text-[14px] text-[#9499a0] ml-[15px] mr-[30px] pt-[3px]">{testVideoObject.commentItems.length}</span>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <span className="mr-4 cursor-pointer">最热</span>
+                                        <span className="cursor-pointer">最新</span>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 评论输入框 */}
+                            <div className="flex items-center mb-[18px]">
+                                <div className={`${isMobile ? 'w-10 h-10' : 'w-[48px] h-[48px]'} rounded-full overflow-hidden mr-2.5`}>
+                                    <Image
+                                        src={testVideoObject.user.avatarUrl}
+                                        alt="User avatar"
+                                        width={isMobile ? 40 : 48}
+                                        height={isMobile ? 40 : 48}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="说点什么..."
+                                    className={`${inputClassName} ${isMobile ? 'h-[40px] text-sm' : 'h-[50px]'}`}
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    onFocus={() => setIsFocused(true)}
+                                    onBlur={() => setIsFocused(false)}
+                                />
+                                <button className={`${isMobile ? 'px-3 py-1.5 text-sm' : 'px-6 py-2'} bg-[#00aeec] text-white rounded-lg hover:bg-[#0096cc] transition-colors duration-200`}>
+                                    发送
+                                </button>
+                            </div>
+
+                            <VideoComment commentItems={testVideoObject.commentItems} />
+                        </div>
+                    )}
+
+                    {/* 移动端推荐视频 - 根据选项卡显示 */}
+                    {isMobile && activeTab === 'recommend' && (
+                        <div className="mb-4">
+                            <VideoRecommendList recommendList={testVideoObject.recommendList} isMobile={isMobile} />
+                        </div>
+                    )}
                 </div>
 
-                {/* 右侧内容 */}
-                <div className="min-w-[400px] w-[400px] h-full ml-5">
-                    {/* 作者信息 */}
-                    <div className="flex items-center">
-                        <div className="w-12 h-12 rounded-full overflow-hidden mr-2">
-                            <Link href={`/space/${testVideoObject.user.id}`}>
-                                <Image
-                                    src={testVideoObject.user.avatarUrl}
-                                    alt="User avatar"
-                                    width={48}
-                                    height={48}
-                                    className="w-full h-full object-cover"
-                                />
-                            </Link>
-                        </div>
-                        <div className="flex-1">
-                            <div className="text-base font-semibold mb-1.5 text-[#18191c]">
+                {/* 右侧内容 - 仅在非移动端显示 */}
+                {!isMobile && (
+                    <div className={`${isTablet ? 'min-w-[300px] w-[300px]' : 'min-w-[400px] w-[400px]'} h-full ml-5`}>
+                        {/* 作者信息 */}
+                        <div className="flex items-center">
+                            <div className="w-12 h-12 rounded-full overflow-hidden mr-2">
                                 <Link href={`/space/${testVideoObject.user.id}`}>
-                                    {testVideoObject.user.name}
+                                    <Image
+                                        src={testVideoObject.user.avatarUrl}
+                                        alt="User avatar"
+                                        width={48}
+                                        height={48}
+                                        className="w-full h-full object-cover"
+                                    />
                                 </Link>
                             </div>
-                            <div className="text-sm text-[#9499a0] mt-0.5">
-                                {testVideoObject.user.desc}
-                            </div>
-                            <div className="mt-1.5 flex w-[230px] h-[30px] bg-[#00aeec] text-white rounded-[5px] text-sm cursor-pointer items-center justify-center transition-colors hover:bg-[#48ceff]">
-                                <i className="iconfont icon-guanzhu"></i>
-                                <span className="mx-1.5">关注</span>
-                                <span>1000</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 弹幕列表 */}
-                    <div className="my-[15px] mb-5 w-full">
-                        <div className="w-full h-11 rounded-[5px] bg-[#f1f2f3] flex items-center px-4">
-                            <div className="text-base font-semibold text-[#18191c]">
-                                弹幕列表
+                            <div className="flex-1">
+                                <div className="text-base font-semibold mb-1.5 text-[#18191c]">
+                                    <Link href={`/space/${testVideoObject.user.id}`}>
+                                        {testVideoObject.user.name}
+                                    </Link>
+                                </div>
+                                <div className="text-sm text-[#9499a0] mt-0.5">
+                                    {testVideoObject.user.desc}
+                                </div>
+                                <div className="mt-1.5 flex w-[230px] h-[30px] bg-[#00aeec] text-white rounded-[5px] text-sm cursor-pointer items-center justify-center transition-colors hover:bg-[#48ceff]">
+                                    <i className="iconfont icon-guanzhu"></i>
+                                    <span className="mx-1.5">关注</span>
+                                    <span>1000</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* 推荐视频 */}
-                    <VideoRecommendList recommendList={testVideoObject.recommendList} />
-                </div>
+                        {/* 弹幕列表 */}
+                        <div className="my-[15px] mb-5 w-full">
+                            <div className="w-full h-11 rounded-[5px] bg-[#f1f2f3] flex items-center px-4">
+                                <div className="text-base font-semibold text-[#18191c]">
+                                    弹幕列表
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 推荐视频 */}
+                        <VideoRecommendList recommendList={testVideoObject.recommendList} />
+                    </div>
+                )}
             </div>
         </div>
     )
