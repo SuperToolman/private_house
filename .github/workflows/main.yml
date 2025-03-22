@@ -1,4 +1,4 @@
-name: Actions CI - Next.js Build & Deploy
+name: Actions CI - Next.js Build & Deployd
 
 on:
   push:
