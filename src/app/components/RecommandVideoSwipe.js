@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+import { useResponsive } from '../contexts/ResponsiveContext';
 
 // 导入Swiper样式
 import 'swiper/css';
@@ -13,6 +14,7 @@ import 'swiper/css/navigation';
 export default function RecommandVideoSwipe() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const swiperRef = useRef(null);
+    const { isMobile } = useResponsive();
     
     // 轮播图数据（标题和主色调）
     const slidesData = [
@@ -63,6 +65,7 @@ export default function RecommandVideoSwipe() {
                 navigation={{
                     nextEl: '.swiper-button-next',
                     prevEl: '.swiper-button-prev',
+                    enabled: !isMobile, // 在移动设备上禁用导航按钮
                 }}
                 onSlideChange={(swiper) => setCurrentIndex(swiper.realIndex)}
                 onSwiper={(swiper) => {
@@ -79,7 +82,8 @@ export default function RecommandVideoSwipe() {
                                 className="w-full object-cover rounded-t-lg"
                                 width={100}
                                 height={100}
-                                sizes="100vw"
+                                sizes={isMobile ? "(max-width: 768px) 100vw" : "50vw"}
+                                priority={index === 0} // 优先加载第一张图片
                             />
                         </div>
                     </SwiperSlide>
@@ -88,29 +92,35 @@ export default function RecommandVideoSwipe() {
             
             {/* 标题容器 - 移到轮播图外部 */}
             <div 
-                className="w-full h-[85px] p-2.5 text-white rounded-b-lg"
+                className={`w-full ${isMobile ? 'h-[60px] p-2' : 'h-[85px] p-2.5'} text-white rounded-b-lg`}
                 style={{ 
                     backgroundColor: slidesData[currentIndex].color,
                     transition: 'background-color 0.5s ease'
                 }}
             >
-                <h3 className="text-lg font-bold m-0">{slidesData[currentIndex].title}</h3>
+                <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold m-0 line-clamp-2`}>
+                    {slidesData[currentIndex].title}
+                </h3>
             </div>
             
-            {/* 自定义导航按钮 */}
-            <button 
-                className="swiper-button-prev absolute top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 text-white rounded-full text-xl flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 hover:bg-black/70 left-2.5"
-            >
-                &lt;
-            </button>
-            <button 
-                className="swiper-button-next absolute top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 text-white rounded-full text-xl flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 hover:bg-black/70 right-2.5"
-            >
-                &gt;
-            </button>
+            {/* 自定义导航按钮 - 在非移动设备上显示 */}
+            {!isMobile && (
+                <>
+                    <button 
+                        className="swiper-button-prev absolute top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 text-white rounded-full text-xl flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 hover:bg-black/70 left-2.5"
+                    >
+                        &lt;
+                    </button>
+                    <button 
+                        className="swiper-button-next absolute top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 text-white rounded-full text-xl flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 hover:bg-black/70 right-2.5"
+                    >
+                        &gt;
+                    </button>
+                </>
+            )}
             
             {/* 自定义分页器 */}
-            <div className="swiper-pagination absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+            <div className={`swiper-pagination absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20 ${isMobile ? 'bottom-4' : 'bottom-6'}`}>
                 {/* 分页器将由Swiper自动生成 */}
             </div>
             
@@ -135,6 +145,17 @@ export default function RecommandVideoSwipe() {
                 .swiper-button-next:after,
                 .swiper-button-prev:after {
                     display: none;
+                }
+                
+                /* 移动端优化 */
+                @media (max-width: 768px) {
+                    .swiper-pagination-bullet {
+                        width: 0.4rem;
+                        height: 0.4rem;
+                    }
+                    .swiper-pagination-bullet-active {
+                        width: 0.9rem;
+                    }
                 }
             `}</style>
         </div>

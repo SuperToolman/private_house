@@ -1,7 +1,10 @@
+'use client';
+
 import Image from "next/image";
 import Link from "next/link";
-import RecommandVideoSwipe from "./components/RecommandVideoSwipe";
-import VideoCard from "./components/VideoCard";
+import { ResponsiveProvider } from "./contexts/ResponsiveContext";
+import NavSection from "./components/NavSection";
+import ContentGrid from "./components/ContentGrid";
 
 export default function Home() {
   // 视频测试数据列表 - 16条数据
@@ -182,55 +185,24 @@ export default function Home() {
 
   return (
     <>
-      <div className="w-full h-[175.5px] bg-gray-100"></div>
-      <div className="w-full h-full px-[140px] flex flex-col">
-        {/* 菜单导航栏 */}
-        <div className="h-20 my-5 flex">
-          <div className="flex mr-5">
-            <Link href="/" className="mr-4 flex flex-col items-center inline-block">
-              <i className="iconfont icon-channel_dyanmic mb-1.5 icon-large" style={{fontSize:'46px'}}></i>
-              <span>动态</span>
-            </Link>
-            <Link href="/" className="mr-4 flex flex-col items-center inline-block">
-              <i className="iconfont icon-channel_hot mb-1.5 icon-large" style={{fontSize:'44px'}}></i>
-              <span>热门</span>
-            </Link>
-          </div>
-          <div className="flex-1 flex">
-            <div className="flex-1 grid grid-flow-col grid-cols-12 grid-rows-2 gap-2.5 pr-8 mr-4 border-r border-gray-200">
-              {categories.map((category) => (
-                <Link 
-                  key={category.id} 
-                  href={`/category/${category.id}`}
-                  className="inline-block w-full h-full border border-gray-200 rounded-md bg-gray-50 text-gray-600 text-center transition-colors duration-300 hover:text-gray-900 hover:bg-gray-200 flex flex-col items-center justify-center"
-                >
-                  <span>{category.name}</span>
-                </Link>
-              ))}
-            </div>
-            <div className="grid grid-flow-col grid-rows-2 gap-2.5 w-[168px] flex-shrink-0">
-              <Link href="/" className="flex items-center justify-end text-gray-600 transition-colors duration-300 hover:text-gray-900">专栏</Link>
-              <Link href="/" className="flex items-center justify-end text-gray-600 transition-colors duration-300 hover:text-gray-900">直播</Link>
-              <Link href="/" className="flex items-center justify-end text-gray-600 transition-colors duration-300 hover:text-gray-900">相簿</Link>
-              <Link href="/" className="flex items-center justify-end text-gray-600 transition-colors duration-300 hover:text-gray-900">会员购</Link>
-              <Link href="/" className="flex items-center justify-end text-gray-600 transition-colors duration-300 hover:text-gray-900">赛事</Link>
-              <Link href="/" className="flex items-center justify-end text-gray-600 transition-colors duration-300 hover:text-gray-900">会员购</Link>
-            </div>
-          </div>
-        </div>
-
-        {/* 轮播图与推荐视频 */}
-        <div className="grid grid-cols-5 gap-2.5">
-          <div className="col-span-2 row-span-2 w-full h-full">
-            <RecommandVideoSwipe />
-          </div>
-          {testVideos.map((video) => (
-            <div key={video.id}>
-              <VideoCard {...video} />
-            </div>
-          ))}
-        </div>
+      <div className="w-full h-[100px] md:h-[175.5px] bg-gray-100"></div>
+      <div className="w-full h-full px-3 md:px-6 lg:px-[140px] flex flex-col">
+        <NavSection categories={categories} />
+        <ContentGrid videos={testVideos} />
       </div>
+      
+      {/* 移动设备样式 */}
+      <style jsx global>{`
+        @media (max-width: 767px) {
+          .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+          .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+          }
+        }
+      `}</style>
     </>
   )
 }

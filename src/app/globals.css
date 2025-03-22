@@ -66,6 +66,10 @@
   --line_light: var(--Ga1_s);
   --line_regular: var(--Ga2);
   --line_bold: var(--Ga3);
+
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 255, 255, 255;
+  --background-end-rgb: 255, 255, 255;
 }
 
 /* 重置样式 */
@@ -142,4 +146,99 @@ a {
     --line_regular: var(--Ga7);
     --line_bold: var(--Ga6);
   }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
+}
+
+/* 自定义颜色变量 */
+:root {
+  --brand-pink: #fb7299;
+  --text-1: #18191c;
+  --text-2: #61666d;
+  --text-3: #9499a0;
+}
+
+/* Tailwind自定义颜色类 */
+.text-brand-pink {
+  color: var(--brand-pink);
+}
+
+.bg-brand-pink {
+  background-color: var(--brand-pink);
+}
+
+.text-text-1 {
+  color: var(--text-1);
+}
+
+.text-text-2 {
+  color: var(--text-2);
+}
+
+.text-text-3 {
+  color: var(--text-3);
+}
+
+/* 动画 */
+@keyframes jump {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-jump {
+  animation: jump 0.6s ease;
+}
+
+/* 响应式样式 */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+  
+  /* 改善移动设备上的点击区域 */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* 特定元素的点击区域例外 */
+  .mobile-touch-friendly a, .mobile-touch-friendly button {
+    min-height: auto;
+    min-width: auto;
+  }
+  
+  /* 改善移动设备上的滚动体验 */
+  .smooth-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  /* 禁用某些悬停效果，它们在触摸设备上无意义 */
+  .hover\:animate-jump:hover {
+    animation: none;
+  }
+}
+
+/* 平板设备样式 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+/* 禁用拖动时的蓝色高亮 */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 平滑滚动 */
+html {
+  scroll-behavior: smooth;
 }
