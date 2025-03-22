@@ -4,14 +4,22 @@ import Link from 'next/link';
 import HeaderUserBox from './HeaderUserBox';
 import { useState } from 'react';
 import { useResponsive } from '../contexts/ResponsiveContext';
+import { useRouter } from 'next/navigation';
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { isMobile } = useResponsive();
+    const router = useRouter();
 
     // 切换菜单状态
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
+    };
+
+    // 处理移动端菜单链接点击
+    const handleMenuLinkClick = (href) => {
+        setIsMenuOpen(false); // 关闭菜单
+        router.push(href); // 导航到目标页面
     };
 
     return (
@@ -124,31 +132,76 @@ export default function Header() {
                 <div className="fixed top-16 left-0 w-full h-screen bg-white z-50 p-4 shadow-lg overflow-y-auto">
                     <ul className="flex flex-col space-y-4">
                         <li>
-                            <Link href="/" className="text-lg font-medium block py-2 border-b">首页</Link>
+                            <button 
+                                onClick={() => handleMenuLinkClick('/')} 
+                                className="text-lg font-medium block py-2 border-b w-full text-left"
+                            >
+                                首页
+                            </button>
                         </li>
                         <li>
-                            <Link href="/anime" className="text-lg font-medium block py-2 border-b">番剧</Link>
+                            <button 
+                                onClick={() => handleMenuLinkClick('/anime')} 
+                                className="text-lg font-medium block py-2 border-b w-full text-left"
+                            >
+                                番剧
+                            </button>
                         </li>
                         <li>
-                            <Link href="/manga" className="text-lg font-medium block py-2 border-b">漫画</Link>
+                            <button 
+                                onClick={() => handleMenuLinkClick('/manga')} 
+                                className="text-lg font-medium block py-2 border-b w-full text-left"
+                            >
+                                漫画
+                            </button>
                         </li>
                         <li>
-                            <Link href="/game" className="text-lg font-medium block py-2 border-b">游戏</Link>
+                            <button 
+                                onClick={() => handleMenuLinkClick('/game')} 
+                                className="text-lg font-medium block py-2 border-b w-full text-left"
+                            >
+                                游戏
+                            </button>
                         </li>
                         <li>
-                            <Link href="/" className="text-lg font-medium block py-2 border-b">消息</Link>
+                            <button 
+                                onClick={() => handleMenuLinkClick('/')} 
+                                className="text-lg font-medium block py-2 border-b w-full text-left"
+                            >
+                                消息
+                            </button>
                         </li>
                         <li>
-                            <Link href="/space/1/collect" className="text-lg font-medium block py-2 border-b">收藏</Link>
+                            <button 
+                                onClick={() => handleMenuLinkClick('/space/1/collect')} 
+                                className="text-lg font-medium block py-2 border-b w-full text-left"
+                            >
+                                收藏
+                            </button>
                         </li>
                         <li>
-                            <Link href="/" className="text-lg font-medium block py-2 border-b">历史</Link>
+                            <button 
+                                onClick={() => handleMenuLinkClick('/')} 
+                                className="text-lg font-medium block py-2 border-b w-full text-left"
+                            >
+                                历史
+                            </button>
                         </li>
                         <li>
-                            <Link href="/" className="text-lg font-medium block py-2 border-b">动态</Link>
+                            <button 
+                                onClick={() => handleMenuLinkClick('/')} 
+                                className="text-lg font-medium block py-2 border-b w-full text-left"
+                            >
+                                动态
+                            </button>
                         </li>
                         <li>
-                            <Link href="/produce" className="text-lg font-medium block py-2 border-b">创作中心</Link>
+                            <button 
+                                onClick={() => handleMenuLinkClick('/produce')} 
+                                className="text-lg font-medium block py-2 border-b w-full text-left"
+                            >
+                                创作中心
+                            </button>
                         </li>
                     </ul>
                 </div>
