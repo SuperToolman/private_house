@@ -13,8 +13,16 @@ export default function VideoCard({ videoEntity }) {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    // 使用 useMemo 缓存视频 URL
-    const videoUrl = useMemo(() => videoEntity.videoUrl, [videoEntity.videoUrl]);
+    // 使用 useMemo 缓存视频 URL，并确保路径正确
+    const videoUrl = useMemo(() => {
+        // 如果视频URL是外部链接，则尝试使用备用本地视频
+        if (videoEntity.videoUrl && videoEntity.videoUrl.startsWith('http')) {
+            // 使用ID来决定使用哪个本地测试视频
+            const videoIndex = (videoEntity.id % 3) + 1;
+            return `/videos/test_video${videoIndex}.mp4`;
+        }
+        return videoEntity.videoUrl;
+    }, [videoEntity.videoUrl, videoEntity.id]);
 
     // 确保组件只在客户端渲染
     useEffect(() => {

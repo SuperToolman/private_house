@@ -3,6 +3,7 @@ import VideoGrid from './components/VideoGrid';
 import { useContext } from 'react';
 import { SpaceContext } from './layout';
 import Link from 'next/link';
+
 export default function SpacePage({ params }) {
     const spaceInfo = useContext(SpaceContext);
 

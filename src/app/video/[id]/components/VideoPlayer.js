@@ -13,6 +13,14 @@ export default function VideoPlayer({url}){
                     controls
                     width="100%"
                     height="100%"
+                    config={{
+                        file: {
+                            attributes: {
+                                controlsList: 'nodownload'
+                            },
+                            forceVideo: true
+                        }
+                    }}
                 />
             </div>
             <div className="bg-[#fff] w-full h-[60px] py-[3px] px-[5px] items-center flex">
