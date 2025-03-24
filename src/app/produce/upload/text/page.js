@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react';
-import RichText from '@/app/components/RichText';
+import RichText from '@common/RichText';
 
 export default function TextUpload() {
     const [title, setTitle] = useState('');

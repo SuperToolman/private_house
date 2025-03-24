@@ -1,7 +1,8 @@
 'use client';
 
 import VideoRecommendCard from "./VideoRecommendCard";
-import { useResponsive } from '../../../contexts/ResponsiveContext';
+import { useResponsive } from '@contexts/ResponsiveContext';
+import VideoCard2 from "@/components/common/VideoCard2";
 
 export default function VideoRecommendList({ recommendList, isMobile }) {
     const { isClient } = useResponsive();
@@ -21,13 +22,13 @@ export default function VideoRecommendList({ recommendList, isMobile }) {
                         自动联播
                     </div>
                 </div>
-                <VideoRecommendCard key={recommendList[0].id} videoEntity={recommendList[0]} isMobile={isMobile} />
+                <VideoCard2 key={recommendList[0].id} videoEntity={recommendList[0]} isMobile={isMobile} />
             </div>
             <div className="video-recommend-list">
                 {
                     recommendList.filter((item, index) => index !== 0).map((item) => (
                         <div key={item.id} className={`${isMobile ? 'mb-3' : 'mb-[12px]'}`}>
-                            <VideoRecommendCard videoEntity={item} isMobile={isMobile} />
+                            <VideoCard2 videoEntity={item} isMobile={isMobile} />
                         </div>
                     ))
                 }

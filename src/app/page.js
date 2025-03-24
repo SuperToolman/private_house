@@ -16,7 +16,8 @@ export default function Home() {
       releaseData: '2024-03-21',
       playCount: 23567,
       duration: '10:23',
-      coverUrl: '/images/test_videoCard_cover (1).avif'
+      coverUrl: '/images/test_videoCard_cover (1).avif',
+      previewUrl: '/videos/test_video2.mp4'
     },
     {
       id: 2,
@@ -25,7 +26,8 @@ export default function Home() {
       releaseData: '2024-03-20',
       playCount: 156789,
       duration: '18:45',
-      coverUrl: '/images/test_videoCard_cover (2).avif'
+      coverUrl: '/images/test_videoCard_cover (2).avif',
+      previewUrl: '/videos/test_video2.mp4'
     },
     {
       id: 3,
@@ -34,7 +36,8 @@ export default function Home() {
       releaseData: '2024-03-19',
       playCount: 89752,
       duration: '08:32',
-      coverUrl: '/images/test_videoCard_cover (3).avif'
+      coverUrl: '/images/test_videoCard_cover (3).avif',
+      previewUrl: '/videos/test_video2.mp4'
     },
     {
       id: 4,
@@ -43,7 +46,8 @@ export default function Home() {
       releaseData: '2024-03-18',
       playCount: 45678,
       duration: '15:20',
-      coverUrl: '/images/test_videoCard_cover (4).avif'
+      coverUrl: '/images/test_videoCard_cover (4).avif',
+      previewUrl: '/videos/test_video2.mp4'
     },
     {
       id: 5,
@@ -52,7 +56,8 @@ export default function Home() {
       releaseData: '2024-03-17',
       playCount: 112345,
       duration: '12:50',
-      coverUrl: '/images/test_videoCard_cover (5).avif'
+      coverUrl: '/images/test_videoCard_cover (5).avif',
+      previewUrl: '/videos/test_video2.mp4'
     },
     {
       id: 6,
@@ -61,7 +66,8 @@ export default function Home() {
       releaseData: '2024-03-16',
       playCount: 67890,
       duration: '14:32',
-      coverUrl: '/images/test_videoCard_cover (6).avif'
+      coverUrl: '/images/test_videoCard_cover (6).avif',
+      previewUrl: '/videos/test_video2.mp4'
     },
     {
       id: 7,
@@ -70,7 +76,8 @@ export default function Home() {
       releaseData: '2024-03-15',
       playCount: 234567,
       duration: '16:49',
-      coverUrl: '/images/test_videoCard_cover (7).avif'
+      coverUrl: '/images/test_videoCard_cover (7).avif',
+      previewUrl: '/videos/test_video2.mp4'
     },
     {
       id: 8,
@@ -79,7 +86,8 @@ export default function Home() {
       releaseData: '2024-03-14',
       playCount: 98765,
       duration: '03:28',
-      coverUrl: '/images/test_videoCard_cover (8).avif'
+      coverUrl: '/images/test_videoCard_cover (8).avif',
+      previewUrl: '/videos/test_video2.mp4'
     },
     {
       id: 9,
@@ -88,7 +96,8 @@ export default function Home() {
       releaseData: '2024-03-13',
       playCount: 54321,
       duration: '09:15',
-      coverUrl: '/images/test_videoCard_cover (9).avif'
+      coverUrl: '/images/test_videoCard_cover (9).avif',
+      previewUrl: '/videos/test_video2.mp4'
     },
     {
       id: 10,
@@ -97,7 +106,8 @@ export default function Home() {
       releaseData: '2024-03-12',
       playCount: 87654,
       duration: '11:22',
-      coverUrl: '/images/test_videoCard_cover (10).avif'
+      coverUrl: '/images/test_videoCard_cover (10).avif',
+      previewUrl: '/videos/test_video2.mp4'
     },
     {
       id: 11,
@@ -106,7 +116,8 @@ export default function Home() {
       releaseData: '2024-03-11',
       playCount: 123456,
       duration: '07:46',
-      coverUrl: '/images/test_videoCard_cover (11).avif'
+      coverUrl: '/images/test_videoCard_cover (11).avif',
+      previewUrl: '/videos/test_video2.mp4'
     },
     {
       id: 12,
@@ -115,7 +126,8 @@ export default function Home() {
       releaseData: '2024-03-10',
       playCount: 345678,
       duration: '13:37',
-      coverUrl: '/images/test_videoCard_cover (12).avif'
+      coverUrl: '/images/test_videoCard_cover (12).avif',
+      previewUrl: '/videos/test_video2.mp4'
     },
     {
       id: 13,
@@ -124,7 +136,8 @@ export default function Home() {
       releaseData: '2024-03-09',
       playCount: 76543,
       duration: '09:58',
-      coverUrl: '/images/test_videoCard_cover (13).avif'
+      coverUrl: '/images/test_videoCard_cover (13).avif',
+      previewUrl: '/videos/test_video2.mp4'
     },
     {
       id: 14,
@@ -133,7 +146,8 @@ export default function Home() {
       releaseData: '2024-03-08',
       playCount: 55555,
       duration: '20:15',
-      coverUrl: '/images/test_videoCard_cover (14).avif'
+      coverUrl: '/images/test_videoCard_cover (14).avif',
+      previewUrl: '/videos/test_video2.mp4'
     },
     {
       id: 15,
@@ -142,7 +156,8 @@ export default function Home() {
       releaseData: '2024-03-07',
       playCount: 88888,
       duration: '17:23',
-      coverUrl: '/images/test_videoCard_cover (15).avif'
+      coverUrl: '/images/test_videoCard_cover (15).avif',
+      previewUrl: '/videos/test_video2.mp4'
     },
     {
       id: 16,
@@ -151,7 +166,8 @@ export default function Home() {
       releaseData: '2024-03-06',
       playCount: 999999,
       duration: '08:51',
-      coverUrl: '/images/test_videoCard_cover (16).avif'
+      coverUrl: '/images/test_videoCard_cover (16).avif',
+      previewUrl: '/videos/test_video2.mp4'
     }
   ];
 

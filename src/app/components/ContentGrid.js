@@ -2,7 +2,7 @@
 
 import { useResponsive } from '../contexts/ResponsiveContext';
 import RecommandVideoSwipe from './RecommandVideoSwipe';
-import VideoCard from './VideoCard';
+import VideoCard from '../../components/common/VideoCard';
 
 export default function ContentGrid({ videos }) {
   const { isMobile, isTablet } = useResponsive();
@@ -22,7 +22,7 @@ export default function ContentGrid({ videos }) {
       </div>
       {videos.map((video, index) => (
         <div key={video.id} className={isMobile && index >= 6 ? 'hidden' : ''}>
-          <VideoCard {...video} />
+          <VideoCard videoEntity = {video} />
         </div>
       ))}
     </div>
