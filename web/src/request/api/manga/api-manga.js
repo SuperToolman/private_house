@@ -51,4 +51,28 @@ export default class extends BaseApi{
         })
     }
 
+    UpdateMangaReview = (manga) => {
+        return myAxios({
+            method: 'post',
+            url: `/Manga/Review`,
+            data: manga
+        });
+    }
+
+    ReviewManga = (manga) => {
+        return myAxios({
+            method: 'post',
+            url: `/Manga/Review`,
+            data: manga
+        });
+    }
+
+    RejectManga = (manga) => {
+        return myAxios({
+            method: 'post',
+            url: `/Manga/Reject`,
+            data: manga
+        });
+    }
+
 }

@@ -4,7 +4,7 @@ import {message} from "ant-design-vue";
 const props = defineProps({
   videoList:{type:Array,default:[]}
 })
-const emits = defineEmits(['handleIndexUp','handleIndexDown'])
+const emits = defineEmits(['handleIndexUp','handleIndexDown','handleDifferentialSupplementation','handleDeleteOk'])
 const contrastModelOpen = ref(false)
 const coverEntity = ref({
   dataURL:null,
@@ -13,6 +13,7 @@ const coverEntity = ref({
 
 const videoRefs = ref([]);        // 存储视频元素引用数组
 const progress = ref(0);          // 控制全局进度条
+const api = inject('api')
 
 // 同步进度条
 const syncProgress = () => {
@@ -57,9 +58,19 @@ const onModalOpenChange = (open) => {
   }
 };
 
-const handleDeleteListItem=()=>{
-  message.success('删除成功')
+const handleDeleteListItem=(videoId)=>{
+  api.videoApi.DeleteById(videoId).then(res=>{
+    if (res.isSuccess){
+      emits('handleDeleteOk',videoId)
+    }
+  })
 }
+const handleDifferentialSupplementation=()=>{
+  //补充差分视频
+  console.log('补充差分视频')
+  emits('handleDifferentialSupplementation')
+}
+
 watch(props,()=>{
   console.log('DifferenceList的发生watch？')
   coverEntity.value = props.cover;
@@ -69,7 +80,7 @@ watch(props,()=>{
 <template>
   <PhCard title="视频列表">
     <a-space style="margin-bottom: 10px" >
-      <a-button type="primary" @click="contrastModelOpen = true">补充差分视频</a-button>
+      <a-button type="primary" @click="handleDifferentialSupplementation">补充差分视频</a-button>
       <a-button type="primary" @click="contrastModelOpen = true">对比视频</a-button>
     </a-space>
     <ul>
@@ -117,13 +128,17 @@ watch(props,()=>{
               </div>
             </a-space>
             <div>
-              <a-button @click="emits('handleIndexUp',index)">上升</a-button>
-              <a-button @click="emits('handleIndexDown',index)">下降</a-button>
+              <a-button @click="emits('handleIndexUp',index)" style="margin-right: 5px">
+                <ArrowUpOutlined />
+              </a-button>
+              <a-button @click="emits('handleIndexDown',index)">
+                <ArrowDownOutlined />
+              </a-button>
               <a-popconfirm
                 title="确定要删除该视频吗？"
                 ok-text="删除"
                 cancel-text="取消"
-                @confirm="handleDeleteListItem"
+                @confirm="handleDeleteListItem(videoEntity.id)"
             >
               <a-button type="primary" danger>
                 <DeleteOutlined/>

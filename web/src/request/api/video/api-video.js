@@ -6,22 +6,8 @@ export default class extends BaseApi{
     constructor() {
         super('Video');
     }
-    // Submission = formData =>{
-    //     console.log('提交的投稿',formData)
-    //     return myAxios({
-    //         method: 'post',
-    //         url: `/Video/Submission`,
-    //         data: {userId:formData.userId,
-    //         videoFileList:formData.videoFileList[0],
-    //         coverFileList:formData.coverFileList[0]},
-    //         headers: {
-    //             'Content-Type': 'multipart/form-data' // 设置请求头为 multipart/form-data，表示上传文件
-    //         },
-    //         maxContentLength: Infinity, // 设置最大内容长度为无限大
-    //     })
-    // }
-
     UploadToTemp = (file,config = {}) =>{
+        console.log('开始上传？',file)
         // console.log('开始上传文件',file)
         const formData = new FormData()
         formData.append('file',file)
@@ -43,6 +29,14 @@ export default class extends BaseApi{
             url: `/Video/GetByCombinationQuery?areaId=${areaId}&videoAuditStatus=${auditStatus}&videoCountOption=${countOption}`,
         })
     }
+
+    CombinationQueryPaged = (pageIndex=1,pageSize=15,areaId=-1,videoAuditStatus=-1,videoCountOption = 5) =>{
+        return myAxios({
+            method:'get',
+            url:`/Video/CombinationQueryPaged?pageIndex=${pageIndex}&pageSize=${pageSize}&areaId=${areaId}&videoAuditStatus=${videoAuditStatus}&videoCountOption=${videoCountOption}`
+        })
+    }
+
     AdoptForReview = (videoId) =>{
         return myAxios({
             method: 'post',
@@ -63,7 +57,6 @@ export default class extends BaseApi{
     SubmissionByDifference = (videoListByDifference, videos) => {
         // 创建 videos 的副本，并将 videoListByDifference 插入到副本的开头
         const videosCopy = [videoListByDifference, ...videos];
-
         console.log('投稿差异视频表单：', videosCopy);
 
         return myAxios({
@@ -107,6 +100,27 @@ export default class extends BaseApi{
         return myAxios({
             method:'get',
             url:`/Video/UUID?uuid=${uuid}`
+        })
+    }
+
+    GetStatisticalData = ()=>{
+        return myAxios({
+            method:'get',
+            url:`/Video/StatisticalData`
+        })
+    }
+
+    DeleteByDifferenceId = (differenceId)=>{
+        return myAxios({
+            method:'delete',
+            url:`/Video/${differenceId}`
+        })
+    }
+
+    GetByDifferenceId = (getByDifferenceId,orderType = 0)=>{
+        return myAxios({
+            method:'get',
+            url:`/Video/${getByDifferenceId}/${orderType}`
         })
     }
 }

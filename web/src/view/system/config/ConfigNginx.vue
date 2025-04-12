@@ -4,7 +4,7 @@ import {api} from "@request/mangement";
 import PhQuestionCircleOutlined from "@components/ph_inputs/ph-QuestionCircleOutlined.vue";
 import PhTable from "@components/ph_inputs/Ph-Table.vue";
 import {SwapOutlined} from "@ant-design/icons-vue"
-import PhCard from "@components/ph_inputs/PhCard.vue";
+import PhCard from "@components/ph_inputs/common/PhCard.vue";
 
 let formState = ref({
   url:'',

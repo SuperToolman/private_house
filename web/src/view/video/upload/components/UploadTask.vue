@@ -1,6 +1,6 @@
 <script setup>
 
-import PhCard from "@components/ph_inputs/PhCard.vue";
+import PhCard from "@components/ph_inputs/common/PhCard.vue";
 
 const props = defineProps({
   videos:{type:Array,default:[]},

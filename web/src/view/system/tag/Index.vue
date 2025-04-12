@@ -1,14 +1,27 @@
 <script setup>
-import PhTag from "../../../components/ph_inputs/PhTag.vue";
+import PhTagByTagEntity from "@components/ph_inputs/system_module/PhTagByTagEntity.vue";
+import TagDetailDialog from "./components/TagDetailDialog.vue";
 
 const api = inject('api')
 const tagList = ref(null)
+const selectedTag = ref(null)
+const isDialogOpen = ref(false)
 
 onMounted(()=>{
   api.systemTagApi.Get().then(res=>{
     tagList.value = res.data
+    console.log('获取标签数据',tagList.value)
   })
 })
+
+const openDialog = (tag) => {
+  selectedTag.value = tag
+  isDialogOpen.value = true
+}
+
+const closeDialog = () => {
+  isDialogOpen.value = false
+}
 </script>
 
 <template>
@@ -16,10 +29,11 @@ onMounted(()=>{
     <ph-card>
       <div class="tags-container-wrap">
         <div class="tags-container">
-          <PhTag :tag-entity="tag" v-for="tag in tagList" :key="tag.id"/>
+          <PhTagByTagEntity :tag-entity="tag" v-for="tag in tagList" :key="tag.id" @openTagDetail="openDialog(tag)" @handleTagEdit="handleEdit(tag)" @handleTagDelete="handleDelete(tag)"/>
         </div>
       </div>
     </ph-card>
+    <TagDetailDialog :tag-entity="selectedTag" :open="isDialogOpen" @close="closeDialog"/>
   </ph-view-layout>
 </template>
 

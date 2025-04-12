@@ -1,8 +1,4 @@
 <script setup>
-
-import {DeleteOutlined, EditOutlined, MoreOutlined} from "@ant-design/icons-vue";
-import PhViewLayout from "@components/ph_inputs/PhViewLayout.vue";
-import PhCard from "@components/ph_inputs/PhCard.vue";
 </script>
 
 <template>

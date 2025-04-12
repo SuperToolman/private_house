@@ -96,3 +96,33 @@ export const formatFileSize =(bytes)=> {
 
     return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
 }
+
+/**
+ * 通过url和filename返回File对象
+ * @param url
+ * @param fileName
+ * @returns {Promise<unknown>}
+ */
+export const getFileFromUrl = (url, fileName) => {
+    return new Promise((resolve, reject) => {
+        let blob = null;
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", url);
+        xhr.setRequestHeader('Accept', 'image/png');
+        xhr.responseType = "blob";
+        // 加载时处理
+        xhr.onload = () => {
+            // 获取返回结果
+            blob = xhr.response;
+            let file= new File([blob], fileName, { type: 'image/png' });
+            // 返回结果
+            resolve(file);
+        };
+        xhr.onerror = (e) => {
+            reject(e)
+        };
+        // 发送
+        xhr.send();
+    });
+}
+

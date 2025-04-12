@@ -1,8 +1,16 @@
 <template>
   <div>
     <!--外围表单信息-->
-    <a-input v-if="userEntity" v-model:value="userEntity.name" @click="openStatus = true;"/>
-    <a-input v-else @click="openStatus = true;"/>
+    <div class="trigger-wrap">
+      <div class="trigger" @click="openStatus = true;">
+        <slot name="trigger">
+          <a-input v-if="userEntity" v-model:value="userEntity.name"/>
+          <a-input v-else/>
+        </slot>
+      </div>
+
+    </div>
+
 
     <!--表单选择-->
     <a-modal
@@ -52,7 +60,7 @@ import {
 
 const api = inject('api')
 const props = defineProps({
-  userEntity:{type:Object,default:null}
+  userEntity:{type:Object,default:null},
 })
 const emits = defineEmits(['handleSelectUser'])
 const selectUserId = ref('')

@@ -8,6 +8,11 @@ export default class extends BaseApi{
     UploadAvatar = (avatarFileBlob,userUUID)=>{
         const formData = new FormData()
         formData.append('avatarFile', avatarFileBlob, `${userUUID}.webp`);
+        formData.append('userUUID', userUUID);
+        //打印formData
+        for (let key of formData.entries()) {
+            console.log(key[0], key[1]);
+        }
         return myAxios({
             method:'post',
             data:formData,
@@ -30,6 +35,33 @@ export default class extends BaseApi{
         return myAxios({
             method:'post',
             url:`/User/Simple?userName=${userName}`
+        })
+    }
+
+    /*@
+        添加其他平台链接
+        @param {string} userId - 用户ID
+        @param {string} link - 链接
+        @return {Promise} - 返回Promise对象
+    @*/
+    AddOtherPlatformLink = (userId,link) =>{
+        return myAxios({
+            method:'post',
+            url:`/User/AddOtherPlatformLink?userId=${userId}&link=${link}`
+        })
+    }
+
+    RemoveOtherPlatformLink = (linkId)=>{
+        return myAxios({
+            method:'delete',
+            url:`/User/RemoveOtherPlatformLink?linkId=${linkId}`
+        })
+    }
+
+    EditOtherPlatformLink = (linkId,newLink)=>{
+        return myAxios({
+            method:'put',
+            url:`/User/EditOtherPlatformLink?linkId=${linkId}&newLink=${newLink}`
         })
     }
 }

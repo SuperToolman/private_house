@@ -1,6 +1,7 @@
 <script setup>
 
 import SelectPreview from "./SelectPreview.vue";
+import PhSelectTagInput from "@components/ph_inputs/common/PhSelectTagInput.vue";
 
 const api = inject('api')
 const props = defineProps({
@@ -54,14 +55,20 @@ const handleChangeTagList = (tagArray)=>{
           <a-radio value="1">转载</a-radio>
         </a-radio-group>
       </a-form-item>
-      <a-form-item label="分区" name="videoArea">·
+      <a-form-item label="分区" name="videoArea">
         <PhSelectVideoAreaInput2
             v-if="videos[activeVideoIndex].videoAreaEntity"
             :active-area="videos[activeVideoIndex].videoAreaEntity"
             @handle-select="handleSelectArea"/>
       </a-form-item>
       <a-form-item label="标签" name="tagString">
-        <ph-select-video-tag-modal :tag-list="videos[activeVideoIndex].tagList" :tag-recommend-tag-list="videos[activeVideoIndex].recommendTagList" @handle-change-tag-list="handleChangeTagList"/>
+<!--        <ph-select-video-tag-modal :tag-list="videos[activeVideoIndex].tagList" :tag-recommend-tag-list="videos[activeVideoIndex].recommendTagList" @handle-change-tag-list="handleChangeTagList"/>-->
+        <PhSelectTagInput
+            :is-auto-add-tag="true"
+            :tag-list=videos[activeVideoIndex].tagList
+            :tag-recommend-tag-list="videos[activeVideoIndex].recommendTagList"
+            @handle-change-tag-list="handleChangeTagList"
+        />
       </a-form-item>
       <a-form-item label="简介" name="description">
         <a-input v-model:value="videos[activeVideoIndex].desc"/>

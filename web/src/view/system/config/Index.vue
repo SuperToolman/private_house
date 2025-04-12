@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
-import PhFromLayout from "@components/ph_inputs/PhViewLayout.vue";
-import PhCard from "@components/ph_inputs/PhCard.vue";
+import PhFromLayout from "@components/ph_inputs/common/PhViewLayout.vue";
+import PhCard from "@components/ph_inputs/common/PhCard.vue";
 const activeKey = ref(0);
 const handleClick = (index) => {activeKey.value = index;};
 </script>

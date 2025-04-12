@@ -1,7 +1,7 @@
 <script setup>
 import {reactive} from "vue";
 import {api} from "@request/mangement";
-import PhCard from "@components/ph_inputs/PhCard.vue";
+import PhCard from "@components/ph_inputs/common/PhCard.vue";
 let formState = reactive({
   id: '',
   name: '',

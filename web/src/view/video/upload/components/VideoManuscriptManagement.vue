@@ -1,5 +1,5 @@
 <script setup>
-import PhCard from "@components/ph_inputs/PhCard.vue";
+import PhCard from "@components/ph_inputs/common/PhCard.vue";
 
 const emits = defineEmits(['handleDeleteManuscriptVideo','handleAdoptOK'])
 const props = defineProps({

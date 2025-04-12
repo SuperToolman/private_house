@@ -1,5 +1,5 @@
 <script setup>
-import VideoHelper from "@common/js/videoHelper";
+import VideoUtils from "@common/js/videoUtils";
 import DifferenceList from "@view/video/upload/components/DifferenceList.vue";
 import SelectPreview from "@view/video/upload/components/SelectPreview.vue";
 
@@ -15,6 +15,7 @@ const videoDifferenceForm = ref({
   videoAreaEntity: {parent:null, child:null},
   tagString: '',
   tagList: [],
+  recommendTagList:[],
   cover: null,
   desc: '',
   videoType:1,
@@ -29,16 +30,19 @@ const handleFileChange = async(event)=>{
   videoDifferenceForm.value.title = files[0].name.substring(0,files[0].name.lastIndexOf('.'))
   if (files.length) {
     if (videoPreviewTimeList.value.length === 0){
-      const videoHelper = new VideoHelper(files[0]);
+      // 获取视频推荐标签
+      //获取推荐标签
+      await api.systemTagApi.GetRandomByCount(20).then(res => {
+        videoDifferenceForm.recommendTagList = res.data
+      })
       // 获取视频时长
+      const videoHelper = new VideoUtils(files[0]);
       const maxTime = await videoHelper.getDuration()
       // 生成随机时间列表
       for (let i = 0; i < 6; i++) {
         videoPreviewTimeList.value.push(Math.random() * maxTime);
       }
     }
-
-    console.log(videoPreviewTimeList.value)
 
     files.forEach(file => {
       // 初始化表单和上传状态信息
@@ -50,9 +54,12 @@ const handleFileChange = async(event)=>{
         total: (file.size / 1024 / 1024).toFixed(1),  // 文件总大小，单位MB
         uploadSpeed: 0, // 实时网速，单位 MB/s
         estimatedTime: 0, // 估算的剩余时间，单位 秒
-        size:file.size,
         fileName:file.name,
+
+        size:file.size,
         durationBySecond:0,
+        listByDifferenceIndex:0,
+        resolution:'',
         cover: null,
         previews: [],
         coverUrl:'',
@@ -71,7 +78,8 @@ const handleFileChange = async(event)=>{
     for (const [index, video] of videos.value.entries()) {
       if (video.status === 'wait') {
         video.status = 'have'
-
+        video.listByDifferenceIndex = index+1
+        console.log(video)
         //生成预览图
         createPreviews(video)
 
@@ -107,8 +115,6 @@ const handleFileChange = async(event)=>{
             video.id = parseInt(res.data.id);
             video.videoUrl = res.data.videoUrl
             video.coverUrl = res.data.coverUrl
-            console.log('接收上传回调',video)
-            // console.log(`上传成功: 文件ID - ${video.id}`);
           })
         } catch (error) {
           video.status = 'error';
@@ -126,7 +132,11 @@ const handleChoseCover = (cover)=>{
 }
 
 const createPreviews = async (video)=>{
-  const videoHelper = new VideoHelper(video.file)
+  const videoHelper = new VideoUtils(video.file)
+  const videoData = await videoHelper.getDurationWithResolution();
+  video.durationBySecond = videoData.duration
+  video.resolution = videoData.resolution
+
   // 截取随机时间点的预览图
   for (let time of videoPreviewTimeList.value) {
     const res = await videoHelper.getPreview(time);
@@ -159,45 +169,58 @@ const handleSelectArea = (areaEntity) => {
     obj.videoAreaEntity = areaEntity
   });
 
-  console.log('选中的分区', videoDifferenceForm.value.videoAreaEntity)
 }
 
-const handleIndexUp = (index)=>{
-  if (videos.value.length >1){
-    if (index !== 0){
-      //列表大于2且部位顶部则上升
-      const upContent = videos.value[index-1]
-      videos.value[index-1] = videos.value[index]
-      videos.value[index] = upContent
-      console.log('执行了上升操作',videos.value)
-    }
+const handleIndexUp = (index) => {
+  if (videos.value.length > 1 && index !== 0) {
+    // 交换元素
+    [videos.value[index], videos.value[index - 1]] = [videos.value[index - 1], videos.value[index]]
+
+    // 更新索引字段（交换后的新位置）
+    videos.value[index].listByDifferenceIndex = index          // 原 index-1 项的新位置
+    videos.value[index - 1].listByDifferenceIndex = index - 1 // 原 index 项的新位置
+
+    console.log('上升操作后:', videos.value)
   }
 }
 
-const handleIndexDown = (index)=>{
-  if (videos.value.length >1){
-    if (index !== videos.value.length-1){
-      //列表大于2且部位顶部则上升
-      const downContent = videos.value[index+1]
-      videos.value[index+1] = videos.value[index]
-      videos.value[index] = downContent
-      console.log('执行了下降操作',videos.value)
-    }
+const handleIndexDown = (index) => {
+  if (videos.value.length > 1 && index !== videos.value.length - 1) {
+    // 交换元素
+    [videos.value[index], videos.value[index + 1]] = [videos.value[index + 1], videos.value[index]]
+
+    // 更新索引字段
+    videos.value[index].listByDifferenceIndex = index          // 原 index+1 项的新位置
+    videos.value[index + 1].listByDifferenceIndex = index + 1  // 原 index 项的新位置
+
+    console.log('下降操作后:', videos.value)
   }
 }
 
 const handleSubmission = ()=>{
+  //上传封面
+  for (const [index, video] of videos.value.entries()) {
+    api.videoApi.UploadCover(videos.value[index].uuid,video.cover)
+  }
   //提交数据
-  api.videoApi.SubmissionByDifference(videoDifferenceForm.value,videos.value)
-  //上传头像
-  api.videoApi.UploadCover(videos.value[0].uuid,videoDifferenceForm.value.cover)
+  api.videoApi.SubmissionByDifference(videoDifferenceForm.value,videos.value).then(res=>{
+    if (res.isSuccess){
+      //刷新页面
+    }
+  })
+}
+
+const handleDeleteOk=(videoId)=>{
+  videos.value = videos.value.filter(item => item.id !== videoId)
 }
 </script>
 
 <template>
   <PhViewLayout title="差分视频上传" sub-title="差分视频指的是视频集合中，每一个视频，在整体视频中内容大体一致，只有略微区别，是一种特殊的视频集合">
     <input id="videoInput" @change="handleFileChange"
-           accept=".mp4,.flv,.avi,.wmv,.mov,.webm,.mpeg4,.ts,.mpg,.rm,.rmvb,.mkv,.m4v" multiple="multiple" type="file"
+           accept=".mp4,.flv,.avi,.wmv,.mov,.webm,.mpeg4,.ts,.mpg,.rm,.rmvb,.mkv,.m4v"
+           multiple="multiple"
+           type="file"
            style="display: none">
     <div class="have-file-container" v-if="videos && videos.length > 0">
       <ph-card :title="'基本信息'">
@@ -235,8 +258,12 @@ const handleSubmission = ()=>{
                 @handle-select="handleSelectArea"/>
           </a-form-item>
           <a-form-item label="标签" name="tagString">
-            <PhSelectVideoTagModal :tag-list="videoDifferenceForm.tagList" @handle-change-tag-list="handleChangeTagList"/>
-            <!--              <ph-select-video-tag-modal :tag-list="videoDifferenceForm.tagList" @handle-change-tag-list="handleChangeTagList"/>-->
+            <PhSelectTagInput
+                :is-auto-add-tag="true"
+                :tag-list="videoDifferenceForm.tagList"
+                :tag-recommend-tag-list="videoDifferenceForm.recommendTagList"
+                @handle-change-tag-list="handleChangeTagList"
+            />
           </a-form-item>
           <a-form-item label="简介" name="description">
             <a-input v-model:value="videoDifferenceForm.desc"/>
@@ -245,7 +272,13 @@ const handleSubmission = ()=>{
       </ph-card>
 
       <!--视频列表-->
-      <DifferenceList :video-list="videos" @handle-index-up="handleIndexUp" @handle-index-down="handleIndexDown"/>
+      <DifferenceList
+          :video-list="videos"
+          @handle-index-up="handleIndexUp"
+          @handle-index-down="handleIndexDown"
+          @handle-differential-supplementation="handleUploadClick"
+          @handle-delete-ok="handleDeleteOk"
+      />
 
       <!--action-->
       <ph-card>

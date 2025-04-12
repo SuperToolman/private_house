@@ -1,5 +1,18 @@
 <script setup>
-import {useMenuStore} from '@stores/rightMenuStore';  // 引入 Pinia store
+import {useMenuStore} from '@stores/rightMenuStore';// 引入 Pinia store
+
+const resourceUrl = inject('resourceUrl')
+const router = useRouter()
+const route = useRoute()
+// 接收 fileInfo 数据
+const props = defineProps({
+  fileInfo: {
+    type: Object,
+    required: true
+  }
+});
+
+const emits = defineEmits(['PlayVideo'])
 
 // 获取 Pinia store
 const menuStore = useMenuStore();
@@ -8,15 +21,49 @@ const menuStore = useMenuStore();
 const menuVisible = ref(false);
 const menuPosition = reactive({x: 0, y: 0});
 
-// 内置菜单项
-const menuItems = ref([
-  {label: 'Refresh', action: () => alert('Page refreshed')},
-  {label: 'Copy', action: () => alert('Content copied')},
-  {label: 'Inspect', action: () => alert('Inspecting element')},
-]);
-
 // 当前菜单实例的标识符
 const menuId = Symbol();
+
+// 获取文件扩展名
+const getFileExtension = (fileName) => {
+  const ext = fileName.split('.').pop().toLowerCase();
+  return ext;
+};
+
+// 动态菜单项
+const menuItems = computed(() => {
+  const ext = getFileExtension(props.fileInfo.name);
+
+  if (ext === 'mp4' || ext === 'avi' || ext === 'mov' || ext === 'webm') {
+    // 如果是视频类型，返回视频相关菜单
+    return [
+      {label: '播放视频', action: () => emits('PlayVideo',props.fileInfo)},
+      {
+        label: '上传至标准视频',
+        action: () => {
+          // 跳转到 Upload 页面，并携带文件路径作为查询参数
+          router.push({
+            path: '/video/upload/standard',
+            query: { filePath: resourceUrl + props.fileInfo.targetUrl }
+          })
+        }},
+      {label: '上传至差分视频', action: () => alert('Upload diff video')}
+    ];
+  } else if (ext === 'jpg' || ext === 'jpeg' || ext === 'png' || ext === 'webp') {
+    // 如果是图片类型，返回图片相关菜单
+    return [
+      {label: 'View Image', action: () => alert('View image action')},
+      {label: 'Upload Image', action: () => alert('Upload image')}
+    ];
+  } else {
+    // 对于其他类型文件，显示默认菜单
+    return [
+      {label: 'Refresh', action: () => alert('Refresh action')},
+      {label: 'Copy', action: () => alert('Content copied')},
+      {label: 'Inspect', action: () => alert('Inspecting element')}
+    ];
+  }
+});
 
 // 显示菜单的方法
 const showMenu = (event) => {
@@ -37,7 +84,7 @@ const hideMenu = () => {
   }
 };
 
-// 点击菜单项后隐藏菜单
+// 点击菜单项后隐藏菜单并执行对应操作
 const handleItemClick = (item) => {
   item.action();
   hideMenu();

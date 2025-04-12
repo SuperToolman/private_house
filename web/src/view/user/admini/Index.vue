@@ -1,10 +1,11 @@
 <script setup>
-import { DeleteOutlined, EditOutlined, ManOutlined, WomanOutlined, RobotOutlined } from '@ant-design/icons-vue';
-import PhCard from "@components/ph_inputs/PhCard.vue";
-import PhViewLayout from "@components/ph_inputs/PhViewLayout.vue";
+import { DeleteOutlined, EditOutlined, ManOutlined, WomanOutlined, RobotOutlined, InfoCircleOutlined } from '@ant-design/icons-vue';
+import PhCard from "@components/ph_inputs/common/PhCard.vue";
+import PhViewLayout from "@components/ph_inputs/common/PhViewLayout.vue";
 import { message } from "ant-design-vue";
 import UserModal from "@view/user/management/components/UserModal.vue";
 import dayjs from "dayjs";
+import { ref, onMounted } from "vue";
 
 // 注入 API 和资源 URL
 const api = inject('api');
@@ -18,11 +19,12 @@ const activeUser = ref(null);
 const columns = [
   { title: '管理员编号', dataIndex: 'uuid', key: 'uuid', width: 300 },
   { title: '姓名', dataIndex: 'name', key: 'name' },
-  { title: '性别', dataIndex: 'sex', key: 'sex',width: 60 },
+  { title: '性别', dataIndex: 'sex', key: 'sex', width: 60 },
   { title: '生日', dataIndex: 'birthday', key: 'birthday' },
   { title: '电话', dataIndex: 'phone', key: 'phone' },
   { title: '电子邮箱', dataIndex: 'eMail', key: 'eMail' },
-  { title: '等级', dataIndex: 'level', key: 'level',width:60 },
+  { title: '角色', dataIndex: 'roleItem', key: 'role' },
+  { title: '权限', dataIndex: 'permissionItems', key: 'permissionItems' },
   { title: '操作', key: 'action' }
 ];
 
@@ -31,47 +33,31 @@ const tableData = ref([]);
 
 // 初始化数据
 const dataInit = () => {
-  api.userApi.Get().then(res => {
+  api.adminiApi.Get().then(res => {
     if (res.isSuccess) {
-      tableData.value = res.data;
+      tableData.value = res.data.map(admin => ({
+        ...admin,
+        permissions: admin.role?.permissions?.slice(0, 3) || [], // 最多显示 3 个权限
+        extraPermissions: admin.role?.permissions?.length > 3 ? admin.role.permissions.length - 3 : 0 // 超出的权限数量
+      }));
     }
   });
 };
-const handleAddSimpleResult = (newUser)=>{
-  tableData.value.push(newUser)
-}
-//计算生日剩余日期
-const daysUntilNextBirthday = (birthdayStr)=> {
-  // 当前日期的开始时间（去掉时间部分，只保留日期）
-  const today = dayjs().startOf('day');
 
-  // 今年的生日日期
-  let birthdayThisYear = dayjs(birthdayStr).year(today.year()).startOf('day');
-
-  // 如果今年的生日已经过去了，使用明年的生日
-  if (birthdayThisYear.isBefore(today)) {
-    birthdayThisYear = birthdayThisYear.add(1, 'year');
-  }
-
-  // 计算距离下一个生日的天数
-  return birthdayThisYear.diff(today, 'day');
-}
-// 计算年龄
-const getAge = (birthdayStr) => {
-  const birthday = new Date(birthdayStr);
-  const today = new Date();
-  return today.getFullYear() - birthday.getFullYear();
+const handleAddSimpleResult = (newUser) => {
+  tableData.value.push(newUser);
 };
 
 // 打开抽屉（添加、编辑）
 const openDrawer = (title, showTools, user = null) => {
   drawerTitle.value = title;
   drawerVisible.value = true;
-  activeUser.value = user //激活焦点对象
+  activeUser.value = user; // 激活焦点对象
 };
+
 // 删除用户
 const Delete = (keyValue) => {
-  api.userApi.DeleteById(keyValue).then(res => {
+  api.adminiApi.DeleteById(keyValue).then(res => {
     if (res.isSuccess) {
       message.success(res.message);
       dataInit();
@@ -79,6 +65,12 @@ const Delete = (keyValue) => {
       message.error(res.message);
     }
   });
+};
+// 计算年龄
+const getAge = (birthdayStr) => {
+  const birthday = new Date(birthdayStr);
+  const today = new Date();
+  return today.getFullYear() - birthday.getFullYear();
 };
 
 // 页面加载时初始化数据
@@ -89,25 +81,25 @@ onMounted(() => {
 
 <template>
   <!--头部-->
-  <ph-view-layout title="用户信息管理" sub-title="管理和查看用户们的信息">
+  <ph-view-layout title="账户信息管理" sub-title="管理和查看用户们的信息">
     <template #view-tool>
       <a-space>
-        <a-button type="primary" @click="openDrawer('添加', true,null)">添加</a-button>
-        <PhSimpleAddUser @handle-add-result="handleAddSimpleResult"/>
+        <a-button type="primary" @click="openDrawer('添加', true, null)">添加</a-button>
+        <PhSimpleAddUser @handle-add-result="handleAddSimpleResult" />
       </a-space>
     </template>
 
     <ph-card>
       <!--表格-->
-      <a-table :columns="columns" :data-source="tableData" rowKey="id">
-        <template #bodyCell="{ column, record }">
+      <a-table :columns="columns" :data-source="tableData" rowKey="uuid">
+        <template #bodyCell="{ record, column }">
           <template v-if="column.key === 'name'">
             <a-image
-                v-if="record.haveAvatar"
-                :src="`${userAvatarResource}${record.uuid}.webp`"
-                style="height: 30px; width: 30px; border-radius: 50%;"
+              v-if="record.haveAvatar"
+              :src="`${userAvatarResource}${record.uuid}.webp`"
+              style="height: 30px; width: 30px; border-radius: 50%;"
             />
-            <a-avatar v-else>{{record.name}}</a-avatar>
+            <a-avatar v-else>{{ record.name }}</a-avatar>
             <a class="user-name">{{ record.name }}</a>
           </template>
           <template v-else-if="column.key === 'sex'">
@@ -116,25 +108,32 @@ onMounted(() => {
             <RobotOutlined v-else style="color:#a2a2a2" />
           </template>
           <template v-else-if="column.key === 'birthday'">
-            <span v-if="record.birthday">{{ record.birthday }}（{{ getAge(record.birthday) }}岁）</span>
-            <span v-if="record.birthday && daysUntilNextBirthday(record.birthday) <= 3"
-                  class="iconfont icon-birthday"
-                  :style="{'color':daysUntilNextBirthday(record.birthday) === 0?'#f6c323':'#797979'}">
-            </span>
+            <span v-if="record.birthday">{{ record.birthday.replace('T', ' ') }}（{{ getAge(record.birthday) }}岁）</span>
           </template>
-          <template v-else-if="column.key === 'level'">
-            <span :class="`iconfont icon-user_level_${record.level}`"></span>
+          <template v-else-if="column.key === 'role'">
+            <span>{{ record.roleItem?.name || '无角色' }}</span>
+          </template>
+          <template v-else-if="column.key === 'permissionItems'">
+            <a-popover v-if="record.roleItem?.permissionItems.length > 0" title="权限列表" overlayClassName="permission-popover">
+              <template #content>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                  <div v-for="permission in record.roleItem?.permissionItems" :key="permission.id">
+                    <a-tag color="blue">{{ permission.name }}</a-tag>
+                  </div>
+                </div>
+              </template>
+              <a-tag color="orange">
+                {{ record.roleItem.permissionItems.length }} 个权限
+              </a-tag>
+            </a-popover>
           </template>
           <template v-else-if="column.key === 'action'">
             <span>
-              <!--编辑-->
               <a-tooltip title="编辑">
                 <EditOutlined @click="openDrawer('编辑', true, record)" style="color:#797878; margin-right: 5px;" />
               </a-tooltip>
-
-              <!--删除-->
               <a-tooltip title="删除">
-                <a-popconfirm ok-text="删除" cancel-text="算了" title="删除无法还原！确定删除？" @confirm="Delete(record.id)">
+                <a-popconfirm ok-text="删除" cancel-text="算了" title="删除无法还原！确定删除？" @confirm="Delete(record.uuid)">
                   <DeleteOutlined style="color: #d81e06" />
                 </a-popconfirm>
               </a-tooltip>
@@ -145,13 +144,20 @@ onMounted(() => {
     </ph-card>
 
     <!--用户表单 -->
-    <user-modal :drawer-title="drawerTitle" :open="drawerVisible" :user="activeUser" @handle-close="(res)=>drawerVisible = res"/>
+    <user-modal :drawer-title="drawerTitle" :open="drawerVisible" :user="activeUser" @handle-close="(res) => drawerVisible = res" />
   </ph-view-layout>
 </template>
 
 <style scoped>
 /* 添加你的样式 */
-.user-name{
+.user-name {
   margin-left: 8px;
+}
+
+/* 气泡卡片样式 */
+.permission-popover .ant-popover-inner-content {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 8px;
 }
 </style>

@@ -14,5 +14,10 @@ export default class extends BaseApi{
         })
     }
 
-
+    AddByName = (name)=>{
+        return myAxios({
+            method:'post',
+            url:`/Tag/AddByName/${name}`,
+        })
+    }
 }

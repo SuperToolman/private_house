@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-export const useMenuStore = defineStore('menu', {
+export const useMenuStore = defineStore('rightMenu', {
     state: () => ({
         activeMenu: null,  // 当前激活的菜单ID
     }),

@@ -1,5 +1,4 @@
 <script setup>
-import ItemFileUserAvatar from "@view/file/components/ItemFileUserAvatar.vue";
 import ItemDirectory from "@view/file/components/ItemDirectory.vue";
 import ItemFile from "@view/file/components/ItemFile.vue";
 
@@ -46,10 +45,18 @@ watchEffect(() => {
   baseDirectoryPath.value = route.query.directoryPath || '';
   initData(baseDirectoryPath.value);
 });
+
+const images = ref([
+  "https://picsum.photos/200/200",
+  "https://picsum.photos/300/200",
+  "https://picsum.photos/250/200"
+])
 </script>
 
 <template>
   <PhViewLayout :title="'文件管理'" :sub-title="'管理nginx资源文件'">
+
+
     <PhSpace class="files-body" :flex-count="2">
       <ph-card>
         <div class="link-list-wrap">
@@ -81,8 +88,7 @@ watchEffect(() => {
             <div v-if="fileList && fileList.length >0" class="files-item" v-for="file in fileList" :key="file.name">
               <!--如果为文件类型，则显示源资源-->
               <div v-if="file.type === 'File'" class="item_file">
-                <ItemFileUserAvatar v-if="file.targetUrl.indexOf('UserAvatar') !== -1" :file-info="file"/>
-                <ItemFile v-else :file-info="file"/>
+                <ItemFile :file-info="file"/>
               </div>
 
               <!--如果为目录-->
@@ -102,6 +108,8 @@ watchEffect(() => {
                 <ItemDirectory :base-directory-path="baseDirectoryPath" :file-info="file"/>
               </div>
             </div>
+
+
 
             <!--如果文件不存在-->
             <div v-else>

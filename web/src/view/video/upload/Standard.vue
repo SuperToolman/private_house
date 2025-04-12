@@ -1,5 +1,5 @@
 <script setup>
-import VideoHelper from "@common/js/videoHelper";
+import VideoUtils from "@common/js/videoUtils";
 import VideoManuscriptManagement from "./components/VideoManuscriptManagement.vue";
 import UploadTask from "./components/UploadTask.vue";
 import UploadTaskForm from "./components/UploadTaskForm.vue";
@@ -10,50 +10,55 @@ import {
   removeVideoArray
 } from "@common/js/storageUtils";
 import {message} from "ant-design-vue";
+import {getFileFromUrl} from "@common/js/utils";
 
 const api = inject('api');
 const videos = ref([]);
 const manuscriptVideos = ref([])
 const activeVideoIndex = ref(-1);
 const localFileList = ref([])
+const route = useRoute()
+// 创建一个 ref，用于引用文件输入框
+const fileInput = ref(null);
+const InitUploadVideo = (file)=>{
+  // 初始化表单和上传状态信息
+  videos.value.push({
+    file, // 文件对象
+    progress: 0,
+    status: 'wait', // 上传状态：'wait：等待上传'  'have：正在上传'  'done：上传完成'  'error：上传错误'
+    loaded: 0,
+    total: (file.size / 1024 / 1024).toFixed(1),  // 文件总大小，单位MB
+    uploadSpeed: 0, // 实时网速，单位 MB/s
+    estimatedTime: 0, // 估算的剩余时间，单位 秒
+    size:file.size,
+    fileName:file.name,
+    durationBySecond:0,
+    resolution:'',
+    recommendTagList:[],
 
-const handleUploadClick = ()=>{
-  document.getElementById('videoFiles').click();
+    // 视频信息表单
+    id: '',
+    uuid:'',
+    userId:'',
+    userEntity:'',
+    title: file.name.split('.')[0],
+    type: '0',
+    videoType:0,
+    videoAreaId: '',
+    videoAreaEntity: {parent:null, child:null},
+    tagString: '',
+    tagList: [],
+    cover: null,
+    previews: [],
+    desc: '',
+  });
 }
+const handleUploadClick = ()=>{document.getElementById('videoFiles').click();}
 const handleFileChange = async (event) => {
   const files = Array.from(event.target.files);
   if (files.length) {
     files.forEach(file => {
-      // 初始化表单和上传状态信息
-      videos.value.push({
-        file, // 文件对象
-        progress: 0,
-        status: 'wait', // 上传状态：'wait：等待上传'  'have：正在上传'  'done：上传完成'  'error：上传错误'
-        loaded: 0,
-        total: (file.size / 1024 / 1024).toFixed(1),  // 文件总大小，单位MB
-        uploadSpeed: 0, // 实时网速，单位 MB/s
-        estimatedTime: 0, // 估算的剩余时间，单位 秒
-        size:file.size,
-        fileName:file.name,
-        durationBySecond:0,
-        recommendTagList:[],
-
-        // 视频信息表单
-        id: '',
-        uuid:'',
-        userId:'',
-        userEntity:'',
-        title: file.name.split('.')[0],
-        type: '0',
-        videoType:0,
-        videoAreaId: '',
-        videoAreaEntity: {parent:null, child:null},
-        tagString: '',
-        tagList: [],
-        cover: null,
-        previews: [],
-        desc: '',
-      });
+      InitUploadVideo(file)
     });
 
     // 设置当前活跃的文件索引
@@ -117,11 +122,13 @@ const handleFileChange = async (event) => {
 const createPreviews = async (video) => {
   // 生成预览图
   if (!video.previews.length) {
-    const videoHelper = new VideoHelper(video.file);
+    const videoHelper = new VideoUtils(video.file);
     const previews = await videoHelper.getRandomPreviews(5);
-    const test = await videoHelper.getDuration()
-    video.durationBySecond = await videoHelper.getDuration()
-    console.log(test)
+    const videoData = await videoHelper.getDurationWithResolution()
+
+    video.durationBySecond = videoData.duration
+    video.resolution = videoData.resolution
+    console.log('截取视频封面时获取信息',videoData)
     video.previews = previews;
     video.cover = previews[0];
   }
@@ -183,12 +190,13 @@ const handleOnlySubmission = () => {
         //上传成功
         //移除本地表单数据
         removeItemByIdFromVideoArray(videos.value[activeVideoIndex.value].id)
-        //将该视频移除任务列表
-        videos.value = videos.value.filter(x=>x.id !== videos.value[activeVideoIndex.value].id)
-        const backIndex = activeVideoIndex.value - 1;
+
+        videos.value = videos.value.filter(x=>x.id !== videos.value[activeVideoIndex.value].id)//将该视频移除任务列表
+        activeVideoIndex.value = activeVideoIndex.value - 1;
+
         //刷新审核列表
         initManuscriptVideos()
-        if (backIndex === -1) {
+        if (activeVideoIndex.value === -1 && videos.value.length === 1) {
           //移除的视频为唯一任务
           videos.value = []
         }
@@ -208,7 +216,6 @@ const handleOnlySubmission = () => {
 const handleAllSubmission = () => {
   console.log(videos.value)
 }
-
 const initManuscriptVideos =()=>{
   //初始化审核列表
   api.videoApi.GetByCombinationQuery(-1,1,5).then(res=>{
@@ -217,11 +224,48 @@ const initManuscriptVideos =()=>{
     }
   })
 }
-//删除审核队列item
-const handleDeleteManuscriptVideo = (video)=> manuscriptVideos.value = manuscriptVideos.value.filter(x=>x.id !== video.id)
+const handleDeleteManuscriptVideo = (video)=> manuscriptVideos.value = manuscriptVideos.value.filter(x=>x.id !== video.id)//删除审核队列item
+
+watch(videos.value,(oldValue,newValue)=>{
+  console.log('oldValue',oldValue)
+  console.log('newValue',newValue)
+})
+
 onMounted(() => {
+  // 获取路由中的文件路径参数
+  const filePath = route.query.filePath
+  if (filePath){
+    const fileName = filePath.split("\\").pop()
+    console.log(filePath,fileName)
+    getFileFromUrl(filePath,'test').then(resFile=>{
+      console.log('获取转换文件',resFile)
+    })
+    // console.log(filePath)
+    // // 创建一个 Blob 对象来模拟文件内容，可以给定模拟内容的大小
+    // const fakeContent = new Blob(["fake content"], { type: "video/mp4" });
+    //
+    // // 使用 Blob 创建一个 File 对象，模拟文件的大小和内容
+    // const file = new File([fakeContent], , {
+    //   type: "video/mp4",
+    //   lastModified: Date.now(),
+    // });
+    //
+    // // 模拟选择文件并触发 change 事件
+    // const dataTransfer = new DataTransfer();
+    // dataTransfer.items.add(file);
+    //
+    // // 更新 input 的 files 属性
+    // fileInput.value.files = dataTransfer.files;
+    //
+    // // 手动触发 change 事件
+    // console.log(fileInput.value.files)
+    // const event = new Event("change");
+    // fileInput.value.dispatchEvent(event);
+  }
+
+
   localFileList.value = getLocalVideoArray()
-  initManuscriptVideos()
+  initManuscriptVideos()//初始化审核列表
 })
 </script>
 
@@ -235,7 +279,10 @@ onMounted(() => {
       </div>
     </template>
     <input id="videoFiles" @change="handleFileChange"
-           accept=".mp4,.flv,.avi,.wmv,.mov,.webm,.mpeg4,.ts,.mpg,.rm,.rmvb,.mkv,.m4v" multiple="multiple" type="file"
+           ref="fileInput"
+           accept=".mp4,.flv,.avi,.wmv,.mov,.webm,.mpeg4,.ts,.mpg,.rm,.rmvb,.mkv,.m4v"
+           multiple="multiple"
+           type="file"
            style="display: none">
     <div class="update-container-wrap">
       <div class="update-container">

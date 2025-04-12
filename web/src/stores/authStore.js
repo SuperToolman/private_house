@@ -1,35 +1,44 @@
-import {defineStore} from 'pinia'
+import { defineStore } from 'pinia'
 
-// Store Option
-export const useAuthStore = defineStore('auth',{
-    state : ()=>{//相当于data(){}
-        return{//管理俩个状态 一个是是否登录成功即token是否存在，二是解析的token里面所包含的数据
-            isAuthenticated:false,
-            user:{}
-        }
-    },
-    getters:{//相当于computed计算属性，通过getters对状态state进行获取
-        getAuthenticated(){
+export const useAuthStore = defineStore('auth', {
+    state: () => ({
+        isAuthenticated: false,
+        admin: {}
+    }),
+
+    getters: {
+        getAuthenticated() {
             return this.isAuthenticated
         },
-        getUser(){
-            return this.user
+        getAdmin() {
+            return this.admin
         }
     },
-    actions:{//相当于methods
-        setAuth(isAuth){//修改当前登录状态
-            if (isAuth){
-                this.isAuthenticated  = isAuth;//在pinia中this指代state
-            }else{
-                this.isAuthenticated  = false;
-            }
+
+    actions: {
+        setAuth(isAuth) {
+            this.isAuthenticated = isAuth
         },
-        setUser(user) { //解析的用户
-            if (user) {
-                this.user = user;
-            } else {
-                this.user = {};
-            }
+
+        setAdmin(admin) {
+            this.admin = admin
+        },
+
+        clearAuth() {
+            this.isAuthenticated = false
+            this.admin = {}
+            localStorage.removeItem("token")
         }
+    },
+
+    persist: {
+        enabled: true, // 启用持久化
+        strategies: [
+            {
+                key: 'auth', // 这里设置了一个键名 'auth'，将数据存储到 localStorage 中
+                storage: localStorage, // 使用 localStorage 保存
+                paths: ['isAuthenticated', 'admin'] // 只持久化这两个字段
+            }
+        ]
     }
 })

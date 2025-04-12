@@ -1,66 +1,50 @@
-<script setup>
-import { ref, onMounted } from 'vue';
-
-const props = defineProps({
-  src: {type: String, default: ''},
-  alt: {type: String, default: ''},
-  fit: {type: String, default: 'cover'}, // 默认填充方式
-  display: {
-    type: String,
-    default: 'original', // 默认接受所有文件类型
-    validator(value) {
-      return ['square', 'high', 'long', 'original'].includes(value);
-    },
-  },
-});
-
-const imageStyle = ref({});
-const containerStyle = ref({});
-const placeholder = ref('./assets/img/common/transparent-placeholder.png'); // 透明占位符
-
-// 用于计算图片的长宽比
-const calculateAspectRatio = (img) => {
-  const width = img.naturalWidth;
-  const height = img.naturalHeight;
-
-  if (props.display === 'original') {
-    if (width > height) {
-      // 宽大于高
-      imageStyle.value = {objectFit: 'cover', objectPosition: 'center center'};
-      containerStyle.value = {width: '100%', height: 'auto'}; // 高度自适应，宽度保持100%
-    } else {
-      // 高大于宽
-      imageStyle.value = {objectFit: 'cover', objectPosition: 'center center'};
-      containerStyle.value = {width: '100%', height: 'auto'}; // 高度自适应，宽度保持100%
-    }
-  } else if (props.display === 'square') {
-    // 正方形显示
-    imageStyle.value = {objectFit: 'cover', objectPosition: 'center center'};
-    containerStyle.value = {width: '70px', height: '70px'}; // 固定尺寸
-  }
-};
-
-// 计算图片容器和样式的尺寸
-onMounted(() => {
-  const img = new Image();
-  img.src = props.src;
-  img.onload = () => calculateAspectRatio(img); // 计算图片比例和容器大小
-});
-</script>
-
 <template>
-  <div class="image-wrap" :style="containerStyle">
-    <!-- 懒加载图片：v-lazy已经在main.js配置，所以组件内不需要引入 -->
+  <div class="image-wrap" :style="containerStyle" @click="openPreview">
+    <viewer v-if="preview">
+      <img
+          v-lazy="src"
+          :alt="alt"
+          :style="imageStyle"
+          :src="placeholder"
+          :width="containerStyle.width"
+          :height="containerStyle.height"
+          :border-radius = "containerStyle.borderRadius"
+      />
+    </viewer>
     <img
+        v-else
         v-lazy="src"
         :alt="alt"
         :style="imageStyle"
         :src="placeholder"
         :width="containerStyle.width"
         :height="containerStyle.height"
+        :border-radius = "containerStyle.borderRadius"
     />
   </div>
 </template>
+
+<script setup>
+import { ref, computed } from 'vue';
+
+const props = defineProps({
+  src: { type: String, required: true },
+  alt: { type: String, default: '' },
+  preview: { type: Boolean, default: false },
+  containerStyle: { type: Object, default: () => ({}) },
+  placeholder: { type: String, default: './assets/img/common/transparent-placeholder.png' }
+});
+
+const imageStyle = computed(() => ({
+  objectFit: 'cover', // 默认填充方式
+  objectPosition: 'center center', // 默认居中
+}));
+const openPreview = () => {
+  if (props.preview) {
+    // 预览图片的打开处理逻辑
+  }
+};
+</script>
 
 <style scoped>
 .image-wrap {
@@ -75,7 +59,10 @@ img {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
   transition: opacity 0.3s ease-in-out;
+}
+
+.image-wrap:hover img {
+  opacity: 0.9;
 }
 </style>

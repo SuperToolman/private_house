@@ -2,47 +2,67 @@
 import InfoChapter from "./components/InfoChapter.vue";
 import InfoRecommend from "./components/InfoRecommend.vue";
 import InfoComment from "./components/InfoComment.vue";
-import {formatFileSize} from "@common/js/utils";
+import InfoAuditStatus from "./components/InfoAuditStatus.vue";
+import { formatFileSize } from "@common/js/utils";
+import { message } from "ant-design-vue"; // 引入 message 用于提示
 
-const route = useRoute()
-const router = useRouter()
-const mangaId = ref('')
-const mangaEntity = ref({})
-const api = inject('api')
-const resourceUrl = inject('resourceUrl')
+const route = useRoute();
+const router = useRouter();
+const mangaId = ref("");
+const mangaEntity = ref({});
+const api = inject("api");
+const resourceUrl = inject("resourceUrl");
 
-const getRandomColor = () => {return getRandomColorCode();}
-const dataInit = ()=>{
-  api.mangaApi.GetById(mangaId.value).then(res=>{
-    if (res.isSuccess){
-      console.log('获取漫画信息：',res.data)
-      mangaEntity.value = res.data
+const getRandomColor = () => {
+  return getRandomColorCode();
+};
+const dataInit = () => {
+  api.mangaApi.GetById(mangaId.value).then((res) => {
+    if (res.isSuccess) {
+      console.log("获取漫画信息：", res.data);
+      mangaEntity.value = res.data;
     }
-  })
-}
-const handleRead = ()=>{
-  router.push('/manga/' + mangaId.value)
-}
-onMounted(async () => {
-  mangaId.value = route.params.mangaId
-  dataInit()
-})
+  });
+};
+const handleRead = () => {
+  router.push("/manga/" + mangaId.value);
+};
+const handleDelete = () => {
+  api.mangaApi.DeleteById(mangaEntity.value.id).then((res) => {
+    if (res.isSuccess) {
+      // 删除成功返回首页
+      router.push("/manga/management");
+    }
+  });
+};
 
+onMounted(async () => {
+  mangaId.value = route.params.mangaId;
+  dataInit();
+});
 </script>
 
 <template>
   <PhCard :title="'漫画信息'">
     <div class="manga-info-wrap">
-      <div style="width: 270px;height: 373px">
-        <PhImage v-if="mangaEntity.haveCover" :preview="false" :src="`${resourceUrl}/${mangaEntity.savePath}/${mangaEntity.uuid}/cover.webp`"/>
-        <PhImage v-else :preview="false" :src="`${resourceUrl}/${mangaEntity.savePath}/${mangaEntity.uuid}/00001.webp`"/>
+      <div style="width: 270px; height: 373px">
+        <PhImage
+          v-if="mangaEntity.haveCover"
+          :preview="false"
+          :src="`${resourceUrl}/${mangaEntity.savePath}/${mangaEntity.uuid}/cover.webp`"
+        />
+        <PhImage
+          v-else
+          :preview="false"
+          :src="`${resourceUrl}/${mangaEntity.savePath}/${mangaEntity.uuid}/00001.webp`"
+        />
       </div>
       <div class="manga-info">
         <div class="title">
-          <div class="title-text">{{mangaEntity.title}}</div>
+          <div class="title-text">{{ mangaEntity.title }}</div>
           <div class="score">
             <div class="score_title">2.5分</div>
-            <a-rate :value="2" disabled allow-half/>
+            <a-rate :value="2" disabled allow-half />
             <div class="score_title">，共57人评价</div>
           </div>
         </div>
@@ -51,11 +71,13 @@ onMounted(async () => {
           <a :href="''">王某某</a>，
           <a :href="''">里水平</a>
         </div>
-        <div class="sub-title">作品：
+        <div class="sub-title">
+          作品：
           <a-tag :color="getRandomColor()">原神</a-tag>
           <a-tag :color="getRandomColor()">星球铁道</a-tag>
         </div>
-        <div class="sub-title">登场角色：
+        <div class="sub-title">
+          登场角色：
           <a-tag :color="getRandomColor()">云堇</a-tag>
         </div>
         <div class="tip">
@@ -70,7 +92,7 @@ onMounted(async () => {
           </div>
         </div>
         <div class="desc">
-          <span v-if="mangaEntity.description">{{mangaEntity.description}}</span>
+          <span v-if="mangaEntity.description">{{ mangaEntity.description }}</span>
           <span v-else>暂无简介</span>
         </div>
 
@@ -78,32 +100,34 @@ onMounted(async () => {
           <a-button @click="handleRead()" type="primary">开始阅读</a-button>
           <a-button>续看xxx</a-button>
           <a-button>编辑信息</a-button>
-          <a-button>删除</a-button>
+          <a-button @click="handleDelete" danger>删除</a-button>
         </div>
       </div>
       <PhCard>
         <a-descriptions :bordered="true">
-          <a-descriptions-item :span="4" label="id - uuid">{{mangaEntity.id}} - {{ mangaEntity.uuid }}</a-descriptions-item>
+          <a-descriptions-item :span="4" label="id - uuid">{{ mangaEntity.id }} - {{ mangaEntity.uuid }}</a-descriptions-item>
           <a-descriptions-item :span="4" label="语言">中文</a-descriptions-item>
-          <a-descriptions-item :span="4" label="页数">{{mangaEntity.pageNumber}}</a-descriptions-item>
-          <a-descriptions-item :span="4" label="文件大小">{{formatFileSize(parseInt(mangaEntity.fileSize))}}</a-descriptions-item>
-          <!--          <a-descriptions-item label="章节数">XX</a-descriptions-item>-->
-          <a-descriptions-item :span="4" label="上传时间">{{mangaEntity.addTime}}</a-descriptions-item>
+          <a-descriptions-item :span="4" label="页数">{{ mangaEntity.pageNumber }}</a-descriptions-item>
+          <a-descriptions-item :span="4" label="文件大小">{{ formatFileSize(parseInt(mangaEntity.fileSize)) }}</a-descriptions-item>
+          <a-descriptions-item :span="4" label="上传时间">{{ mangaEntity.addTime }}</a-descriptions-item>
           <a-descriptions-item :span="4" label="出版时间">2024-10-16</a-descriptions-item>
         </a-descriptions>
       </PhCard>
     </div>
   </PhCard>
-  <div class="other-info-wrap">
+
+  <PhSpace :flex-count="1" class="other-info-wrap">
     <!--连载才使用章节-->
     <div class="left">
       <InfoChapter v-if="true" :manga-id="mangaId" style="flex: 1"/>
       <InfoRecommend/>
     </div>
     <div class="right">
+      <!-- 添加漫画历史状态 -->
+      <InfoAuditStatus :audit-status="mangaEntity.auditStatus" :manga-entity="mangaEntity" @audit-change="handleAuditChange" @audit-reject="handleAuditReject"/>
       <InfoComment :manga-id="mangaId"/>
     </div>
-  </div>
+  </PhSpace>
 <!--  测试信息{{mangaId}}-->
 </template>
 
@@ -118,7 +142,6 @@ $manga-info-tile:30px;
     display: flex;
     flex-direction: column;
 
-
     .title{
       display: flex;
       justify-content: space-between;
@@ -127,7 +150,6 @@ $manga-info-tile:30px;
         font-size: $manga-info-tile;
         font-weight: bold;
       }
-
 
       .score{
         display: flex;
@@ -170,8 +192,6 @@ $manga-info-tile:30px;
       margin-top: 10px;
       color: #666666;
     }
-
-
 
     .action{
       margin-top: auto; /* 这个元素将被推到最底部 */

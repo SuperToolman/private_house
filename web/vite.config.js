@@ -10,7 +10,11 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 
 export default defineConfig({
   plugins: [
-    vue(), // 启用 Vue 插件
+    vue({
+      script:{
+        defineModel: true
+      }
+    }), // 启用 Vue 插件
     vueJsx(), // 启用 JSX 支持
     Components({
       resolvers: [

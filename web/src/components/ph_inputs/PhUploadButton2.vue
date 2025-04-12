@@ -28,6 +28,10 @@ const handleUploadClick = () => {
     zipInputRef.value?.click(); // 触发压缩文件选择
   }
 };
+
+defineExpose({
+  handleUploadClick,
+})
 </script>
 
 <template>
@@ -46,6 +50,7 @@ const handleUploadClick = () => {
       style="display: none"
       ref="zipInputRef"
       accept=".zip,.rar,.7z"
+      multiple
       @change="emits('handleFileChange', $event)"
   />
 

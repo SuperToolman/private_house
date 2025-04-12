@@ -3,6 +3,7 @@ const api = inject('api')
 const auditStatus = ref("-1")
 const countOption = ref("0")
 const mangaList = ref([])
+const router = useRouter()
 
 const dataInit = ()=>{
   api.mangaApi.GetByCombinationQuery(auditStatus.value,countOption.value).then(res=>{
@@ -11,6 +12,9 @@ const dataInit = ()=>{
       mangaList.value = res.data;
     }
   })
+}
+const handleGoUpload = ()=>{
+  router.push("/manga/upload")
 }
 onMounted(()=>{
   dataInit()
@@ -37,18 +41,40 @@ onMounted(()=>{
           <a-select-option value="4">按弹幕量</a-select-option>
           <a-select-option value="5">按评论量</a-select-option>
           <a-select-option value="6">按添加时间</a-select-option>
-
         </a-select>
       </div>
     </template>
     <PhCard>
-      <a-space :size="8" :wrap="true">
-        <MangaCard v-for="manga in mangaList" :key="manga.id" :manga-entity="manga"/>
+      <a-space :size="8" :wrap="true" v-if="mangaList && mangaList.length > 0">
+        <MangaCard v-for="manga in mangaList" :key="manga.id" :manga-entity="manga" :width="240" :height="314" />
       </a-space>
+
+      <!--没有数据-->
+      <div v-else>
+        <a-empty
+            style="display: flex;flex-direction: column;align-items: center;"
+            image="https://gw.alipayobjects.com/mdn/miniapp_social/afts/img/A*pevERLJC9v0AAAAAAAAAAABjAQAAAQ/original"
+            :image-style="{height: '160px',}"
+        >
+          <template #description>
+            <div class="empty-description">
+              <div>没有一点漫画</div>
+              <div>ಥ_ಥ</div>
+            </div>
+          </template>
+          <a-button type="primary" @click="handleGoUpload">去上传</a-button>
+        </a-empty>
+      </div>
     </PhCard>
   </PhViewLayout>
 </template>
 
 <style scoped>
-
+.empty-description{
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+}
 </style>

@@ -14,6 +14,10 @@ const handleSubmit = ()=>{
     }
   })
 }
+const handleShowInput = ()=>{
+  inputValue.value = ''
+  showInput.value = true
+}
 
 const handleCancel = ()=>{showInput.value = false;inputValue.value = ''}
 </script>
@@ -28,7 +32,7 @@ const handleCancel = ()=>{showInput.value = false;inputValue.value = ''}
       <a-button @click="handleCancel" danger><UserDeleteOutlined /></a-button>
     </a-tooltip>
   </PhSpace>
-  <a-button v-else @click="showInput = true" type="primary">{{ title }}</a-button>
+  <a-button v-else @click="handleShowInput" type="primary">{{ title }}</a-button>
 </template>
 
 <style scoped>

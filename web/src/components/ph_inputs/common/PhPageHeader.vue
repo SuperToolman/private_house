@@ -1,29 +1,34 @@
 <script setup>
-import PhCard from "@components/ph_inputs/common/PhCard.vue";
+import {message} from "ant-design-vue";
+import {useAuthStore} from "@stores/authStore";
 import {useRouter} from "vue-router";
 
 const props = defineProps({
   title:{type:String,default:'Title'},
   subTitle:{type:String,default:''},
 })
+
 const router = useRouter()
 </script>
 
 <template>
-  <ph-card>
-    <div class="page-header">
-      <div class="left">
-        <img class="back-icon" src="/src/assets/HarmonyOS_Icons/ic_public_back.svg" @click="router.back()">
-        <div class="title">{{title}}</div>
-        <div class="sub-title">{{subTitle}}</div>
-      </div>
-      <div class="right">
-        <slot>
+  <PhSpace flex-count="1">
+    <ph-card>
+      <div class="page-header">
+        <div class="left">
+          <img class="back-icon" src="/src/assets/HarmonyOS_Icons/ic_public_back.svg" @click="router.back()">
+          <div class="title">{{title}}</div>
+          <div class="sub-title">{{subTitle}}</div>
+        </div>
+        <div class="right">
+          <slot>
 
-        </slot>
+          </slot>
+        </div>
       </div>
-    </div>
-  </ph-card>
+    </ph-card>
+
+  </PhSpace>
 </template>
 
 <style scoped>
@@ -60,5 +65,38 @@ const router = useRouter()
       text-overflow: ellipsis;
     }
   }
+}
+
+.anime-info-wrap{
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  .anime-info{
+    display: flex;
+    align-items: center;
+
+    .admin-avatar-wrap{
+      margin-right: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      overflow: hidden;
+      &>*{
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    .admin-name{
+      font-size: 14px;
+      color: var(--text2);
+    }
+  }
+}
+
+.menu-item-wrap{
+  padding: 5px 12px;
 }
 </style>

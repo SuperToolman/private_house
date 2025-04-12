@@ -13,7 +13,8 @@ import systemConfig from './api/system/api-systemConfig'
 import systemFile from './api/system/api-systemFile'
 import systemTag from './api/system/api-systemTag'
 
-
+import admini from './api/admini/api-admini'
+import role from './api/admini/api-role'
 
 // 下面可以分环境打包
 export const api = {
@@ -30,4 +31,7 @@ export const api = {
     systemConfig:new systemConfig(),
     systemFile:new systemFile(),
     systemTagApi:new systemTag(),
+
+    adminiApi: new admini(),
+    roleApi: new role()
 }

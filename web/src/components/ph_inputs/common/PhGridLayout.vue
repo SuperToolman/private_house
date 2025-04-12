@@ -3,14 +3,16 @@
 </script>
 
 <template>
-  <div class="card2-wrap">
+  <div class="ph_grid_layout">
     <slot></slot>
   </div>
 </template>
 
 <style scoped>
-  .card2-wrap{
-    border-radius: 7px;
-    background-color: #00AEEC;
+  .ph_grid_layout{
+    display: grid;
+    grid-gap: 10px;
+    grid-column: span 2;
+    grid-template-columns: repeat(2, 1fr);
   }
 </style>

@@ -6,11 +6,17 @@ const props = defineProps({
 
 <template>
   <div class="card-content-wrap">
-    <div class="card-content-title" v-if="title !== ''">
+    <div class="card-head">
+      <div class="card-content-title" v-if="title !== ''">
       <span class="card-title-text">
         {{title}}
       </span>
+      </div>
+      <div class="card-actions">
+        <slot name="actions"></slot>
+      </div>
     </div>
+
     <div class="card-content-body">
       <slot></slot>
     </div>
@@ -30,16 +36,21 @@ const props = defineProps({
   box-shadow: 1px 2px 3px 1px rgba(116, 116, 116, 0.15);
   //overflow: hidden;
 
-  .card-content-title{
-    //padding-left: 24px;
-    //padding-top: 15px;
-    //margin: 0 0 0 32px;
-    margin-bottom: 15px;
-    font-size: 16px;
-    font-weight: 600;
-    color: #222;
-    line-height: 22px;
+  .card-head{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 7px;
+    .card-content-title{
+      font-size: 16px;
+      font-weight: 600;
+      color: #222;
+    }
+    .card-actions{
+
+    }
   }
+
 
   .card-content-body{
     //padding: 24px;
